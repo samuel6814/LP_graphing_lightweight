@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import styled from 'styled-components';
-import { sampleFunction, lineFromConstraint, parseObjective, worldToSvg } from '../../utils/graphHelpers';
+import { lineFromConstraint, parseObjective, worldToSvg } from '../../utils/graphHelpers';
 import { feasibleRegionPolygon } from '../../utils/feasibleRegion';
+import { samplePlot } from '../../utils/plotSampler';
 import { useResizeObserver } from '../../hooks/useResizeObserver';
 
 const Canvas = styled.div`
@@ -29,6 +30,7 @@ const PLOT_COLORS = {
   teal: '#006a66',
   magenta: '#d81b60',
   indigo: '#182442',
+  amber: '#e65100',
 };
 
 const AXIS_COLOR = '#45464e';
@@ -42,6 +44,15 @@ function buildTicks(min, max, count = 6) {
     ticks.push(Math.round(v * 10) / 10);
   }
   return ticks;
+}
+
+function pointsToPath(points, w, h, xRange, yRange) {
+  return points
+    .map((p, j) => {
+      const { sx, sy } = worldToSvg(p.x, p.y, w, h, xRange, yRange);
+      return `${j === 0 ? 'M' : 'L'} ${sx} ${sy}`;
+    })
+    .join(' ');
 }
 
 export default function GraphCanvas({ expressions = [], lpConfig = null }) {
@@ -71,13 +82,11 @@ export default function GraphCanvas({ expressions = [], lpConfig = null }) {
       lpConfig.constraints.forEach((c, i) => {
         const line = lineFromConstraint(c, xRange);
         if (line?.type === 'line' && line.points.length > 1) {
-          const d = line.points
-            .map((p, j) => {
-              const { sx, sy } = worldToSvg(p.x, p.y, w, h, xRange, yRange);
-              return `${j === 0 ? 'M' : 'L'} ${sx} ${sy}`;
-            })
-            .join(' ');
-          result.push({ d, color: i % 2 === 0 ? PLOT_COLORS.teal : PLOT_COLORS.magenta, dash: true });
+          result.push({
+            d: pointsToPath(line.points, w, h, xRange, yRange),
+            color: i % 2 === 0 ? PLOT_COLORS.teal : PLOT_COLORS.magenta,
+            dash: true,
+          });
         }
         if (line?.type === 'vertical') {
           const { sx } = worldToSvg(line.x, 0, w, h, xRange, yRange);
@@ -98,13 +107,12 @@ export default function GraphCanvas({ expressions = [], lpConfig = null }) {
           if (isFinite(y)) pts.push({ x, y });
         }
         if (pts.length > 1) {
-          const d = pts
-            .map((p, j) => {
-              const { sx, sy } = worldToSvg(p.x, p.y, w, h, xRange, yRange);
-              return `${j === 0 ? 'M' : 'L'} ${sx} ${sy}`;
-            })
-            .join(' ');
-          result.push({ d, color: PLOT_COLORS.magenta, dash: false, objective: true });
+          result.push({
+            d: pointsToPath(pts, w, h, xRange, yRange),
+            color: PLOT_COLORS.magenta,
+            dash: false,
+            objective: true,
+          });
         }
       }
     }
@@ -112,16 +120,16 @@ export default function GraphCanvas({ expressions = [], lpConfig = null }) {
     expressions
       .filter((e) => e.visible)
       .forEach((e) => {
-        const pts = sampleFunction(e.expr, xRange[0], xRange[1]);
-        if (pts.length > 1) {
-          const d = pts
-            .map((p, j) => {
-              const { sx, sy } = worldToSvg(p.x, p.y, w, h, xRange, yRange);
-              return `${j === 0 ? 'M' : 'L'} ${sx} ${sy}`;
-            })
-            .join(' ');
-          result.push({ d, color: PLOT_COLORS[e.color] || PLOT_COLORS.teal });
-        }
+        const { segments } = samplePlot(e.expr, xRange, yRange, e.mode || 'auto');
+        const color = PLOT_COLORS[e.color] || PLOT_COLORS.teal;
+        segments.forEach((seg) => {
+          if (seg.points.length > 1) {
+            result.push({
+              d: pointsToPath(seg.points, w, h, xRange, yRange),
+              color,
+            });
+          }
+        });
       });
 
     return result;

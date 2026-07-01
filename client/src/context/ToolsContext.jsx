@@ -1,9 +1,10 @@
 import { createContext, useContext, useMemo, useState, useCallback } from 'react';
+import { getPlotColor, plotLabel } from '../utils/plotSampler';
 
 const ToolsContext = createContext(null);
 
 const DEFAULT_EXPRESSIONS = [
-  { id: 'f1', label: 'f(x)', expr: 'sin(x)', color: 'teal', visible: true },
+  { id: 'f1', label: 'f1(x)', expr: 'sin(x)', color: 'teal', visible: true, mode: 'auto' },
 ];
 
 export function ToolsProvider({ children }) {
@@ -28,10 +29,11 @@ export function ToolsProvider({ children }) {
       setExpressions(
         defaultGraph.expressions.map((expr, i) => ({
           id: `e${i}`,
-          label: `f${i + 1}(x)`,
+          label: plotLabel(expr, i, 'auto'),
           expr,
-          color: i % 2 === 0 ? 'teal' : 'magenta',
+          color: getPlotColor(i),
           visible: true,
+          mode: 'auto',
         })),
       );
     }

@@ -1,4 +1,5 @@
 import { create, all } from 'mathjs';
+import { sampleExplicit } from './plotSampler';
 
 const math = create(all);
 
@@ -80,18 +81,8 @@ function solveConstraintY(lhs, rhs, x) {
 }
 
 export function sampleFunction(expr, xMin, xMax, steps = 200) {
-  const points = [];
-  const step = (xMax - xMin) / steps;
-  for (let i = 0; i <= steps; i++) {
-    const x = xMin + i * step;
-    try {
-      const y = math.evaluate(expr.replace(/\^/g, '^'), { x });
-      if (typeof y === 'number' && isFinite(y)) points.push({ x, y });
-    } catch {
-      /* skip */
-    }
-  }
-  return points;
+  const { segments } = sampleExplicit(expr, [xMin, xMax], steps);
+  return segments[0]?.points ?? [];
 }
 
 export function evaluateCalc(expr) {

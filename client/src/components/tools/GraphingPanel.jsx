@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { Plus, Eye, EyeOff, X } from 'lucide-react';
 import { useTools } from '../../context/ToolsContext';
+import { getPlotColor, plotLabel, resolvePlotType } from '../../utils/plotSampler';
 import GraphCanvas from './GraphCanvas';
 import media from '../../styles/media';
 
@@ -31,12 +32,12 @@ const List = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.md};
-  max-height: 200px;
+  max-height: 220px;
   overflow-y: auto;
   flex-shrink: 0;
 
   ${media.mobile} {
-    max-height: 120px;
+    max-height: 140px;
     padding: ${({ theme }) => theme.spacing.sm};
   }
 `;
@@ -65,14 +66,19 @@ const CardBody = styled.div`
   }
 `;
 
-const ExprInput = styled.input`
-  width: 100%;
-  font-family: ${({ theme }) => theme.fonts.equation};
-  font-size: ${({ theme }) => theme.typography.equation.fontSize};
-  border: none;
-  background: transparent;
-  color: ${({ theme }) => theme.colors.primary};
-  outline: none;
+const CardHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 8px;
+  flex-wrap: wrap;
+`;
+
+const CardLabel = styled.span`
+  font-family: monospace;
+  font-weight: 700;
+  font-size: 13px;
 `;
 
 const CardActions = styled.div`
@@ -86,6 +92,27 @@ const CardActions = styled.div`
     align-items: center;
     justify-content: center;
   }
+`;
+
+const ExprInput = styled.input`
+  width: 100%;
+  font-family: ${({ theme }) => theme.fonts.equation};
+  font-size: ${({ theme }) => theme.typography.equation.fontSize};
+  border: none;
+  background: transparent;
+  color: ${({ theme }) => theme.colors.primary};
+  outline: none;
+  margin-bottom: 8px;
+`;
+
+const ModeSelect = styled.select`
+  font-size: 12px;
+  padding: 4px 8px;
+  border: 1px solid ${({ theme }) => theme.colors.outlineVariant};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  background: ${({ theme }) => theme.colors.surface};
+  color: ${({ theme }) => theme.colors.onSurfaceVariant};
+  min-height: 32px;
 `;
 
 const GraphArea = styled.div`
@@ -113,13 +140,45 @@ const AddBtn = styled.button`
   min-height: 44px;
 `;
 
-const COLORS = { teal: '#006a66', magenta: '#d81b60' };
+const LpTitle = styled.div`
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-size: 14px;
+`;
+
+const LpLine = styled.div`
+  font-family: monospace;
+  font-size: 14px;
+  word-break: break-all;
+`;
+
+const COLORS = {
+  teal: '#006a66',
+  magenta: '#d81b60',
+  indigo: '#182442',
+  amber: '#e65100',
+};
+
+function placeholderForMode(mode, expr) {
+  const resolved = mode === 'auto' ? resolvePlotType(expr) : mode;
+  return resolved === 'implicit' ? 'x^2 + y^2 = 9' : 'x^2 + 2*x';
+}
 
 export default function GraphingPanel() {
   const { expressions, setExpressions, lpConfig } = useTools();
 
-  const updateExpr = (id, expr) => {
-    setExpressions((prev) => prev.map((e) => (e.id === id ? { ...e, expr } : e)));
+  const updateExpr = (id, patch) => {
+    setExpressions((prev) =>
+      prev.map((e) => {
+        if (e.id !== id) return e;
+        const next = { ...e, ...patch };
+        const idx = prev.findIndex((x) => x.id === id);
+        if (patch.expr !== undefined || patch.mode !== undefined) {
+          next.label = plotLabel(next.expr, idx, next.mode);
+        }
+        return next;
+      }),
+    );
   };
 
   const toggleVisible = (id) => {
@@ -131,10 +190,17 @@ export default function GraphingPanel() {
   };
 
   const addExpr = () => {
-    const n = expressions.length + 1;
+    const n = expressions.length;
     setExpressions((prev) => [
       ...prev,
-      { id: `e${Date.now()}`, label: `f${n}(x)`, expr: 'x^2', color: n % 2 ? 'teal' : 'magenta', visible: true },
+      {
+        id: `e${Date.now()}`,
+        label: plotLabel('x^2', n, 'auto'),
+        expr: 'x^2',
+        color: getPlotColor(n),
+        visible: true,
+        mode: 'auto',
+      },
     ]);
   };
 
@@ -146,14 +212,30 @@ export default function GraphingPanel() {
           <Plus size={18} /> Add
         </AddBtn>
       </Header>
-      {!lpConfig && expressions.length > 0 && (
+      {(lpConfig || expressions.length > 0) && (
         <List>
-          {expressions.map((e) => (
+          {lpConfig && (
+            <Card>
+              <Strip $color={COLORS.teal} />
+              <CardBody>
+                <LpTitle>LP Constraints</LpTitle>
+                {lpConfig.constraints.map((c, i) => (
+                  <LpLine key={i}>{c}</LpLine>
+                ))}
+                {lpConfig.objective && (
+                  <LpLine style={{ marginTop: 8, color: COLORS.magenta }}>{lpConfig.objective}</LpLine>
+                )}
+              </CardBody>
+            </Card>
+          )}
+          {expressions.map((e, i) => (
             <Card key={e.id}>
               <Strip $color={COLORS[e.color] || COLORS.teal} />
               <CardBody>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, gap: 8 }}>
-                  <span style={{ fontFamily: 'monospace', color: COLORS[e.color], fontWeight: 700 }}>{e.label}</span>
+                <CardHeader>
+                  <CardLabel style={{ color: COLORS[e.color] || COLORS.teal }}>
+                    {e.label || plotLabel(e.expr, i, e.mode)}
+                  </CardLabel>
                   <CardActions>
                     <button type="button" onClick={() => toggleVisible(e.id)} aria-label="Toggle visibility">
                       {e.visible ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -162,29 +244,24 @@ export default function GraphingPanel() {
                       <X size={16} />
                     </button>
                   </CardActions>
-                </div>
-                <ExprInput value={e.expr} onChange={(ev) => updateExpr(e.id, ev.target.value)} />
+                </CardHeader>
+                <ExprInput
+                  value={e.expr}
+                  placeholder={placeholderForMode(e.mode || 'auto', e.expr)}
+                  onChange={(ev) => updateExpr(e.id, { expr: ev.target.value })}
+                />
+                <ModeSelect
+                  value={e.mode || 'auto'}
+                  onChange={(ev) => updateExpr(e.id, { mode: ev.target.value })}
+                  aria-label="Plot mode"
+                >
+                  <option value="auto">Auto</option>
+                  <option value="explicit">y = f(x)</option>
+                  <option value="implicit">F(x,y) = 0</option>
+                </ModeSelect>
               </CardBody>
             </Card>
           ))}
-        </List>
-      )}
-      {lpConfig && (
-        <List>
-          <Card>
-            <Strip $color={COLORS.teal} />
-            <CardBody>
-              <div style={{ fontWeight: 600, marginBottom: 4 }}>LP Constraints</div>
-              {lpConfig.constraints.map((c, i) => (
-                <div key={i} style={{ fontFamily: 'monospace', fontSize: 14, wordBreak: 'break-all' }}>{c}</div>
-              ))}
-              {lpConfig.objective && (
-                <div style={{ marginTop: 8, fontFamily: 'monospace', color: COLORS.magenta }}>
-                  {lpConfig.objective}
-                </div>
-              )}
-            </CardBody>
-          </Card>
         </List>
       )}
       <GraphArea>
