@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Search, CheckCircle, ArrowRight } from 'lucide-react';
@@ -7,6 +7,8 @@ import { getTopicPath } from '../../utils/routes';
 import { useTopicProgress } from '../../context/TopicProgressContext';
 import { CardGrid } from '../../styles/layout';
 import media from '../../styles/media';
+
+const DEFAULT_TITLE = 'LP Grapher — MATH 466 Optimization II';
 
 const Header = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing.xl};
@@ -30,6 +32,7 @@ const SearchWrap = styled.div`
   position: relative;
   max-width: 480px;
   width: 100%;
+  margin-bottom: ${({ theme }) => theme.spacing.md};
 
   svg {
     position: absolute;
@@ -54,6 +57,31 @@ const SearchInput = styled.input`
     border-color: ${({ theme }) => theme.colors.primary};
     box-shadow: 0 0 0 2px ${({ theme }) => theme.colors.primaryFixed};
   }
+`;
+
+const ProgressWrap = styled.div`
+  max-width: 480px;
+`;
+
+const ProgressLabel = styled.p`
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.onSurfaceVariant};
+  margin-bottom: ${({ theme }) => theme.spacing.sm};
+`;
+
+const ProgressTrack = styled.div`
+  height: 8px;
+  background: ${({ theme }) => theme.colors.surfaceContainerHigh};
+  border-radius: ${({ theme }) => theme.radii.full};
+  overflow: hidden;
+`;
+
+const ProgressFill = styled.div`
+  height: 100%;
+  background: ${({ theme }) => theme.colors.primary};
+  border-radius: ${({ theme }) => theme.radii.full};
+  width: ${({ $pct }) => $pct}%;
+  transition: width 0.3s ease;
 `;
 
 const ModuleBlock = styled.section`
@@ -122,6 +150,20 @@ export default function LearnHub() {
   const [query, setQuery] = useState('');
   const { isComplete } = useTopicProgress();
 
+  useEffect(() => {
+    document.title = 'Learn Hub — LP Grapher';
+    return () => {
+      document.title = DEFAULT_TITLE;
+    };
+  }, []);
+
+  const completedCount = useMemo(
+    () => topics.filter((t) => isComplete(t.slug)).length,
+    [isComplete],
+  );
+
+  const progressPct = (completedCount / topics.length) * 100;
+
   const filtered = useMemo(() => {
     const q = query.toLowerCase().trim();
     if (!q) return topics;
@@ -143,6 +185,14 @@ export default function LearnHub() {
             onChange={(e) => setQuery(e.target.value)}
           />
         </SearchWrap>
+        <ProgressWrap>
+          <ProgressLabel>
+            {completedCount} of {topics.length} topics complete
+          </ProgressLabel>
+          <ProgressTrack>
+            <ProgressFill $pct={progressPct} />
+          </ProgressTrack>
+        </ProgressWrap>
       </Header>
 
       {modules.map((mod) => {

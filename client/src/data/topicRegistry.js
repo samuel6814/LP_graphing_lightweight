@@ -245,3 +245,11 @@ export function getTopicsByModule(moduleId) {
 export function getModuleTitle(moduleId) {
   return modules.find((m) => m.id === moduleId)?.title ?? `Module ${moduleId}`;
 }
+
+export function getAdjacentTopics(slug) {
+  const i = topics.findIndex((t) => t.slug === slug);
+  return {
+    prev: i > 0 ? topics[i - 1] : null,
+    next: i >= 0 && i < topics.length - 1 ? topics[i + 1] : null,
+  };
+}

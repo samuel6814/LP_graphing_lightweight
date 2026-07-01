@@ -37,11 +37,11 @@ function SectionHeading({ text }) {
   return <Heading>{text}</Heading>;
 }
 
-export default function MathSection({ sections = [] }) {
+export default function MathSection({ sections = [], idPrefix = 'section' }) {
   return (
     <>
       {sections.map((section, i) => (
-        <Section key={i}>
+        <Section key={i} id={`${idPrefix}-${i}`}>
           <SectionHeading text={section.heading} />
           {section.math && <MathBlock>{section.math}</MathBlock>}
           {section.plain && (
