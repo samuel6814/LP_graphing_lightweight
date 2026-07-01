@@ -4,10 +4,11 @@ import { useTools } from '../../context/ToolsContext';
 import GraphingPanel from './GraphingPanel';
 import CalculatorPanel from './CalculatorPanel';
 import StepSolverPanel from './StepSolverPanel';
+import media from '../../styles/media';
 
 const Fab = styled.button`
   position: fixed;
-  bottom: ${({ theme }) => theme.spacing.lg};
+  bottom: calc(${({ theme }) => theme.spacing.lg} + env(safe-area-inset-bottom, 0));
   right: ${({ theme }) => theme.spacing.lg};
   width: 56px;
   height: 56px;
@@ -15,7 +16,7 @@ const Fab = styled.button`
   background: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.onPrimary};
   box-shadow: ${({ theme }) => theme.shadows.popover};
-  display: flex;
+  display: ${({ $hidden }) => ($hidden ? 'none' : 'flex')};
   align-items: center;
   justify-content: center;
   z-index: 100;
@@ -25,8 +26,9 @@ const Fab = styled.button`
     transform: scale(1.05);
   }
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    bottom: 80px;
+  ${media.mobile} {
+    bottom: calc(16px + env(safe-area-inset-bottom, 0));
+    right: 16px;
   }
 `;
 
@@ -53,12 +55,21 @@ const Dock = styled.div`
   transition: transform 0.3s ease;
   box-shadow: ${({ theme }) => theme.shadows.popover};
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  ${media.tablet} {
+    width: min(400px, 90vw);
+  }
+
+  ${media.mobile} {
     top: auto;
-    height: 75vh;
+    left: 0;
+    right: 0;
+    height: min(75vh, 600px);
     width: 100vw;
+    border-left: none;
+    border-top: 1px solid ${({ theme }) => theme.colors.outlineVariant};
     border-radius: ${({ theme }) => theme.radii.xl} ${({ theme }) => theme.radii.xl} 0 0;
     transform: translateY(${({ $open }) => ($open ? '0' : '100%')});
+    padding-bottom: env(safe-area-inset-bottom, 0);
   }
 `;
 
@@ -68,6 +79,7 @@ const DockHeader = styled.div`
   justify-content: space-between;
   padding: ${({ theme }) => theme.spacing.md};
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineVariant};
+  flex-shrink: 0;
 `;
 
 const Tabs = styled.div`
@@ -78,23 +90,38 @@ const Tabs = styled.div`
 const Tab = styled.button`
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  min-height: 44px;
+  min-width: 44px;
   padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.md}`};
   border-radius: ${({ theme }) => theme.radii.md};
   font-size: 13px;
   font-weight: 600;
   background: ${({ $active, theme }) => ($active ? theme.colors.surfaceContainer : 'transparent')};
   color: ${({ $active, theme }) => ($active ? theme.colors.primary : theme.colors.onSurfaceVariant)};
+
+  span {
+    ${media.mobile} {
+      display: none;
+    }
+  }
 `;
 
 const CloseBtn = styled.button`
   padding: ${({ theme }) => theme.spacing.sm};
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: ${({ theme }) => theme.colors.onSurfaceVariant};
 `;
 
 const DockBody = styled.div`
   flex: 1;
   overflow: hidden;
+  min-height: 0;
 `;
 
 const TABS = [
@@ -108,7 +135,7 @@ export default function ToolsDock() {
 
   return (
     <>
-      <Fab type="button" onClick={() => setIsOpen(true)} aria-label="Open math tools">
+      <Fab type="button" $hidden={isOpen} onClick={() => setIsOpen(true)} aria-label="Open math tools">
         <LineChart size={24} />
       </Fab>
       <Overlay $open={isOpen} onClick={() => setIsOpen(false)} />
@@ -117,8 +144,8 @@ export default function ToolsDock() {
           <Tabs>
             {TABS.map(({ id, label, icon: Icon }) => (
               <Tab key={id} type="button" $active={activeTab === id} onClick={() => setActiveTab(id)}>
-                <Icon size={16} />
-                {label}
+                <Icon size={18} />
+                <span>{label}</span>
               </Tab>
             ))}
           </Tabs>

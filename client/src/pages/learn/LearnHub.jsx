@@ -5,6 +5,8 @@ import { Search, CheckCircle, ArrowRight } from 'lucide-react';
 import { topics, modules, getModuleTitle } from '../../data/topicRegistry';
 import { getTopicPath } from '../../utils/routes';
 import { useTopicProgress } from '../../context/TopicProgressContext';
+import { CardGrid } from '../../styles/layout';
+import media from '../../styles/media';
 
 const Header = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing.xl};
@@ -20,11 +22,14 @@ const Title = styled.h1`
 const Sub = styled.p`
   color: ${({ theme }) => theme.colors.onSurfaceVariant};
   margin-bottom: ${({ theme }) => theme.spacing.lg};
+  font-size: ${({ theme }) => theme.typography.bodyMd.fontSize};
+  line-height: 1.6;
 `;
 
 const SearchWrap = styled.div`
   position: relative;
   max-width: 480px;
+  width: 100%;
 
   svg {
     position: absolute;
@@ -43,6 +48,7 @@ const SearchInput = styled.input`
   background: ${({ theme }) => theme.colors.surfaceContainerLowest};
   outline: none;
   font-size: 16px;
+  min-height: 44px;
 
   &:focus {
     border-color: ${({ theme }) => theme.colors.primary};
@@ -56,17 +62,11 @@ const ModuleBlock = styled.section`
 
 const ModuleTitle = styled.h2`
   font-family: ${({ theme }) => theme.fonts.display};
-  font-size: 20px;
+  font-size: ${({ theme }) => theme.typography.headlineSm.fontSize};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing.md};
   padding-bottom: ${({ theme }) => theme.spacing.sm};
   border-bottom: 2px solid ${({ theme }) => theme.colors.surfaceContainerHigh};
-`;
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: ${({ theme }) => theme.spacing.md};
 `;
 
 const Card = styled(Link)`
@@ -87,6 +87,7 @@ const CardTop = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: ${({ theme }) => theme.spacing.sm};
   margin-bottom: ${({ theme }) => theme.spacing.sm};
 `;
 
@@ -94,6 +95,11 @@ const CardTitle = styled.h3`
   font-size: 17px;
   color: ${({ theme }) => theme.colors.primary};
   font-weight: 600;
+  line-height: 1.3;
+
+  ${media.mobile} {
+    font-size: 16px;
+  }
 `;
 
 const CardSummary = styled.p`
@@ -145,7 +151,7 @@ export default function LearnHub() {
         return (
           <ModuleBlock key={mod.id}>
             <ModuleTitle>{getModuleTitle(mod.id)}</ModuleTitle>
-            <Grid>
+            <CardGrid $min="260px">
               {modTopics.map((t) => (
                 <Card key={t.slug} to={getTopicPath(t.slug)}>
                   <CardTop>
@@ -159,7 +165,7 @@ export default function LearnHub() {
                   </CardFooter>
                 </Card>
               ))}
-            </Grid>
+            </CardGrid>
           </ModuleBlock>
         );
       })}

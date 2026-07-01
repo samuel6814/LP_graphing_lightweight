@@ -1,12 +1,13 @@
 import { useMemo } from 'react';
 import styled from 'styled-components';
 import { sampleFunction, lineFromConstraint, parseObjective, worldToSvg } from '../../utils/graphHelpers';
+import { useResizeObserver } from '../../hooks/useResizeObserver';
 
 const Canvas = styled.div`
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 280px;
+  min-height: 200px;
   background: #fff;
   background-image:
     linear-gradient(to right, rgba(117, 119, 126, 0.1) 1px, transparent 1px),
@@ -29,12 +30,15 @@ const PLOT_COLORS = {
   indigo: '#182442',
 };
 
-export default function GraphCanvas({ expressions = [], lpConfig = null, width = 600, height = 400 }) {
+export default function GraphCanvas({ expressions = [], lpConfig = null }) {
+  const [containerRef, { width, height }] = useResizeObserver();
   const xRange = [-1, 10];
   const yRange = [-2, 12];
 
   const paths = useMemo(() => {
     const result = [];
+    const w = width || 600;
+    const h = height || 400;
 
     if (lpConfig?.constraints) {
       lpConfig.constraints.forEach((c, i) => {
@@ -42,18 +46,18 @@ export default function GraphCanvas({ expressions = [], lpConfig = null, width =
         if (line?.type === 'line' && line.points.length > 1) {
           const d = line.points
             .map((p, j) => {
-              const { sx, sy } = worldToSvg(p.x, p.y, width, height, xRange, yRange);
+              const { sx, sy } = worldToSvg(p.x, p.y, w, h, xRange, yRange);
               return `${j === 0 ? 'M' : 'L'} ${sx} ${sy}`;
             })
             .join(' ');
           result.push({ d, color: i % 2 === 0 ? PLOT_COLORS.teal : PLOT_COLORS.magenta, dash: true });
         }
         if (line?.type === 'vertical') {
-          const { sx } = worldToSvg(line.x, 0, width, height, xRange, yRange);
+          const { sx } = worldToSvg(line.x, 0, w, h, xRange, yRange);
           result.push({ vertical: sx, color: PLOT_COLORS.indigo });
         }
         if (line?.type === 'horizontal') {
-          const { sy } = worldToSvg(0, line.y, width, height, xRange, yRange);
+          const { sy } = worldToSvg(0, line.y, w, h, xRange, yRange);
           result.push({ horizontal: sy, color: PLOT_COLORS.indigo });
         }
       });
@@ -69,7 +73,7 @@ export default function GraphCanvas({ expressions = [], lpConfig = null, width =
         if (pts.length > 1) {
           const d = pts
             .map((p, j) => {
-              const { sx, sy } = worldToSvg(p.x, p.y, width, height, xRange, yRange);
+              const { sx, sy } = worldToSvg(p.x, p.y, w, h, xRange, yRange);
               return `${j === 0 ? 'M' : 'L'} ${sx} ${sy}`;
             })
             .join(' ');
@@ -85,7 +89,7 @@ export default function GraphCanvas({ expressions = [], lpConfig = null, width =
         if (pts.length > 1) {
           const d = pts
             .map((p, j) => {
-              const { sx, sy } = worldToSvg(p.x, p.y, width, height, xRange, yRange);
+              const { sx, sy } = worldToSvg(p.x, p.y, w, h, xRange, yRange);
               return `${j === 0 ? 'M' : 'L'} ${sx} ${sy}`;
             })
             .join(' ');
@@ -96,20 +100,22 @@ export default function GraphCanvas({ expressions = [], lpConfig = null, width =
     return result;
   }, [expressions, lpConfig, width, height]);
 
-  const axisX = worldToSvg(0, 0, width, height, xRange, yRange).sy;
-  const axisY = worldToSvg(0, 0, width, height, xRange, yRange).sx;
+  const w = width || 600;
+  const h = height || 400;
+  const axisX = worldToSvg(0, 0, w, h, xRange, yRange).sy;
+  const axisY = worldToSvg(0, 0, w, h, xRange, yRange).sx;
 
   return (
-    <Canvas>
-      <Svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
-        <line x1={0} y1={axisX} x2={width} y2={axisX} stroke="#45464e" strokeWidth="1.5" opacity="0.5" />
-        <line x1={axisY} y1={0} x2={axisY} y2={height} stroke="#45464e" strokeWidth="1.5" opacity="0.5" />
+    <Canvas ref={containerRef}>
+      <Svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+        <line x1={0} y1={axisX} x2={w} y2={axisX} stroke="#45464e" strokeWidth="1.5" opacity="0.5" />
+        <line x1={axisY} y1={0} x2={axisY} y2={h} stroke="#45464e" strokeWidth="1.5" opacity="0.5" />
         {paths.map((p, i) => {
           if (p.vertical !== undefined) {
-            return <line key={i} x1={p.vertical} y1={0} x2={p.vertical} y2={height} stroke={p.color} strokeWidth="2" strokeDasharray="6 4" />;
+            return <line key={i} x1={p.vertical} y1={0} x2={p.vertical} y2={h} stroke={p.color} strokeWidth="2" strokeDasharray="6 4" />;
           }
           if (p.horizontal !== undefined) {
-            return <line key={i} x1={0} y1={p.horizontal} x2={width} y2={p.horizontal} stroke={p.color} strokeWidth="2" strokeDasharray="6 4" />;
+            return <line key={i} x1={0} y1={p.horizontal} x2={w} y2={p.horizontal} stroke={p.color} strokeWidth="2" strokeDasharray="6 4" />;
           }
           return (
             <path

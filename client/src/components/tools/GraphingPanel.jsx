@@ -2,12 +2,13 @@ import styled from 'styled-components';
 import { Plus, Eye, EyeOff, X } from 'lucide-react';
 import { useTools } from '../../context/ToolsContext';
 import GraphCanvas from './GraphCanvas';
+import media from '../../styles/media';
 
 const Panel = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-  min-height: 400px;
+  min-height: 0;
 `;
 
 const Header = styled.div`
@@ -16,6 +17,7 @@ const Header = styled.div`
   justify-content: space-between;
   padding: ${({ theme }) => theme.spacing.md};
   border-bottom: 1px solid ${({ theme }) => theme.colors.outlineVariant};
+  flex-shrink: 0;
 `;
 
 const Title = styled.h3`
@@ -31,6 +33,12 @@ const List = styled.div`
   gap: ${({ theme }) => theme.spacing.md};
   max-height: 200px;
   overflow-y: auto;
+  flex-shrink: 0;
+
+  ${media.mobile} {
+    max-height: 120px;
+    padding: ${({ theme }) => theme.spacing.sm};
+  }
 `;
 
 const Card = styled.div`
@@ -44,11 +52,17 @@ const Card = styled.div`
 const Strip = styled.div`
   width: 6px;
   background: ${({ $color }) => $color};
+  flex-shrink: 0;
 `;
 
 const CardBody = styled.div`
   flex: 1;
   padding: ${({ theme }) => theme.spacing.md};
+  min-width: 0;
+
+  ${media.mobile} {
+    padding: ${({ theme }) => theme.spacing.sm};
+  }
 `;
 
 const ExprInput = styled.input`
@@ -64,12 +78,27 @@ const ExprInput = styled.input`
 const CardActions = styled.div`
   display: flex;
   gap: ${({ theme }) => theme.spacing.sm};
+
+  button {
+    min-width: 32px;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 `;
 
 const GraphArea = styled.div`
   flex: 1;
   padding: ${({ theme }) => theme.spacing.md};
-  min-height: 280px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+
+  ${media.mobile} {
+    min-height: 180px;
+    padding: ${({ theme }) => theme.spacing.sm};
+  }
 `;
 
 const AddBtn = styled.button`
@@ -81,6 +110,7 @@ const AddBtn = styled.button`
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: ${({ theme }) => theme.spacing.sm};
+  min-height: 44px;
 `;
 
 const COLORS = { teal: '#006a66', magenta: '#d81b60' };
@@ -122,7 +152,7 @@ export default function GraphingPanel() {
             <Card key={e.id}>
               <Strip $color={COLORS[e.color] || COLORS.teal} />
               <CardBody>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, gap: 8 }}>
                   <span style={{ fontFamily: 'monospace', color: COLORS[e.color], fontWeight: 700 }}>{e.label}</span>
                   <CardActions>
                     <button type="button" onClick={() => toggleVisible(e.id)} aria-label="Toggle visibility">
@@ -146,7 +176,7 @@ export default function GraphingPanel() {
             <CardBody>
               <div style={{ fontWeight: 600, marginBottom: 4 }}>LP Constraints</div>
               {lpConfig.constraints.map((c, i) => (
-                <div key={i} style={{ fontFamily: 'monospace', fontSize: 14 }}>{c}</div>
+                <div key={i} style={{ fontFamily: 'monospace', fontSize: 14, wordBreak: 'break-all' }}>{c}</div>
               ))}
               {lpConfig.objective && (
                 <div style={{ marginTop: 8, fontFamily: 'monospace', color: COLORS.magenta }}>

@@ -4,15 +4,9 @@ import { ArrowRight } from 'lucide-react';
 import { topics } from '../../data/topicRegistry';
 import { getTopicPath } from '../../utils/routes';
 import { useGsapReveal } from '../../hooks/useGsapReveal';
+import { PageSection, ContentContainer, CardGrid } from '../../styles/layout';
 
-const Section = styled.section`
-  padding: ${({ theme }) => `${theme.spacing.xl} ${theme.spacing.marginDesktop}`};
-`;
-
-const Inner = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-`;
+const Section = styled(PageSection)``;
 
 const Heading = styled.h2`
   font-family: ${({ theme }) => theme.fonts.display};
@@ -21,26 +15,13 @@ const Heading = styled.h2`
   margin-bottom: ${({ theme }) => theme.spacing.lg};
 `;
 
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: ${({ theme }) => theme.spacing.md};
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    grid-template-columns: 1fr;
-  }
-`;
-
 const Card = styled(Link)`
   background: ${({ theme }) => theme.colors.surfaceContainerLowest};
   border: 1px solid ${({ theme }) => theme.colors.outlineVariant};
   border-radius: ${({ theme }) => theme.radii.xl};
   padding: ${({ theme }) => theme.spacing.lg};
   transition: border-color 0.2s, box-shadow 0.2s;
+  display: block;
 
   &:hover {
     border-color: ${({ theme }) => theme.colors.primary};
@@ -57,7 +38,7 @@ const Module = styled.span`
 `;
 
 const Title = styled.h3`
-  font-size: 18px;
+  font-size: ${({ theme }) => theme.typography.headlineSm.fontSize};
   color: ${({ theme }) => theme.colors.primary};
   margin: ${({ theme }) => `${theme.spacing.sm} 0`};
 `;
@@ -75,6 +56,7 @@ const More = styled(Link)`
   margin-top: ${({ theme }) => theme.spacing.lg};
   color: ${({ theme }) => theme.colors.primary};
   font-weight: 600;
+  min-height: 44px;
 `;
 
 const previewTopics = topics.slice(0, 6);
@@ -84,21 +66,21 @@ export default function TopicsPreview() {
 
   return (
     <Section ref={ref}>
-      <Inner>
+      <ContentContainer>
         <Heading data-reveal>Course Topics</Heading>
-        <Grid>
+        <CardGrid $min="260px" data-reveal>
           {previewTopics.map((t) => (
-            <Card key={t.slug} to={getTopicPath(t.slug)} data-reveal>
+            <Card key={t.slug} to={getTopicPath(t.slug)}>
               <Module>Module {t.module}</Module>
               <Title>{t.title}</Title>
               <Summary>{t.summary}</Summary>
             </Card>
           ))}
-        </Grid>
+        </CardGrid>
         <More to="/learn" data-reveal>
           View all {topics.length} topics <ArrowRight size={16} />
         </More>
-      </Inner>
+      </ContentContainer>
     </Section>
   );
 }

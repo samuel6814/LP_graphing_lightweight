@@ -3,6 +3,7 @@
   overflow-y: hidden;
   padding: 0.25rem 0;
   margin: 0.5rem 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 .katex {
@@ -13,8 +14,13 @@
   font-family: "Source Serif 4", Georgia, serif;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .katex-display {
-    font-size: 0.95em;
+    font-size: 0.9em;
+    padding: 0.125rem 0;
+  }
+
+  .math-block.block {
+    padding: 12px;
   }
 }

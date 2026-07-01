@@ -1,7 +1,12 @@
 import { createGlobalStyle } from 'styled-components';
+import { devices } from './theme';
 
 const GlobalStyle = createGlobalStyle`
   @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&family=Hanken+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap');
+
+  :root {
+    --breakpoint-mobile-max: ${devices.mobile};
+  }
 
   *, *::before, *::after {
     box-sizing: border-box;
@@ -21,6 +26,12 @@ const GlobalStyle = createGlobalStyle`
     background: ${({ theme }) => theme.colors.background};
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
+    overflow-x: hidden;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  body.nav-open {
+    overflow: hidden;
   }
 
   #root {

@@ -1,12 +1,15 @@
 import styled from 'styled-components';
 import { useTools } from '../../context/ToolsContext';
 import { evaluateCalc } from '../../utils/graphHelpers';
+import media from '../../styles/media';
 
 const Panel = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
   padding: ${({ theme }) => theme.spacing.md};
+  min-height: 0;
+  overflow-y: auto;
 `;
 
 const Display = styled.div`
@@ -20,6 +23,11 @@ const Display = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  flex-shrink: 0;
+
+  ${media.mobile} {
+    padding: ${({ theme }) => theme.spacing.md};
+  }
 `;
 
 const ExprLine = styled.div`
@@ -27,11 +35,12 @@ const ExprLine = styled.div`
   font-size: 14px;
   color: ${({ theme }) => theme.colors.onSurfaceVariant};
   min-height: 20px;
+  word-break: break-all;
 `;
 
 const ResultLine = styled.div`
   font-family: ${({ theme }) => theme.fonts.mono};
-  font-size: 32px;
+  font-size: clamp(1.5rem, 6vw, 2rem);
   color: ${({ theme }) => theme.colors.primary};
   font-weight: 600;
 `;
@@ -52,6 +61,7 @@ const Key = styled.button`
   color: ${({ $op, theme }) => ($op ? theme.colors.primary : theme.colors.onSurface)};
   border: 1px solid ${({ theme }) => theme.colors.outlineVariant};
   transition: transform 0.1s;
+  min-height: 48px;
 
   &:active {
     transform: scale(0.95);
@@ -64,6 +74,11 @@ const Key = styled.button`
   &.equals {
     background: ${({ theme }) => theme.colors.primary};
     color: ${({ theme }) => theme.colors.onPrimary};
+  }
+
+  ${media.mobile} {
+    min-height: 48px;
+    font-size: 15px;
   }
 `;
 

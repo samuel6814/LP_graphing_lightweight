@@ -9,6 +9,7 @@ import { useTopicProgress } from '../../context/TopicProgressContext';
 import MathSection from '../../components/presentation/MathSection';
 import PracticeQuestion from '../../components/presentation/PracticeQuestion';
 import { ROUTES } from '../../utils/routes';
+import media from '../../styles/media';
 
 const Back = styled(Link)`
   display: inline-flex;
@@ -17,6 +18,7 @@ const Back = styled(Link)`
   color: ${({ theme }) => theme.colors.onSurfaceVariant};
   margin-bottom: ${({ theme }) => theme.spacing.lg};
   font-size: 14px;
+  min-height: 44px;
 
   &:hover {
     color: ${({ theme }) => theme.colors.primary};
@@ -29,34 +31,46 @@ const Layout = styled.div`
   gap: ${({ theme }) => theme.spacing.xl};
   align-items: start;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
+  ${media.tabletDown} {
     grid-template-columns: 1fr;
+    gap: ${({ theme }) => theme.spacing.lg};
   }
 `;
 
-const Main = styled.article``;
+const Main = styled.article`
+  min-width: 0;
+`;
 
 const Title = styled.h1`
   font-family: ${({ theme }) => theme.fonts.display};
   font-size: ${({ theme }) => theme.typography.headlineMd.fontSize};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing.sm};
+  line-height: 1.2;
 `;
 
 const Summary = styled.p`
   color: ${({ theme }) => theme.colors.onSurfaceVariant};
   margin-bottom: ${({ theme }) => theme.spacing.xl};
   font-size: ${({ theme }) => theme.typography.bodyLg.fontSize};
+  line-height: 1.6;
 `;
 
 const Sidebar = styled.aside`
   position: sticky;
   top: 88px;
+  min-width: 0;
+
+  ${media.tabletDown} {
+    position: static;
+    order: 2;
+  }
 `;
 
 const CompleteBtn = styled.button`
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   margin-top: ${({ theme }) => theme.spacing.lg};
   padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.lg}`};
@@ -65,6 +79,11 @@ const CompleteBtn = styled.button`
   border-radius: ${({ theme }) => theme.radii.md};
   font-weight: 600;
   font-size: 14px;
+  min-height: 44px;
+
+  ${media.mobile} {
+    width: 100%;
+  }
 `;
 
 export default function TopicPage() {

@@ -1,31 +1,39 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { ArrowRight, BookOpen, LineChart, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useHeroStagger } from '../../hooks/useGsapReveal';
 import { ROUTES } from '../../utils/routes';
+import { PageSection, ContentContainer } from '../../styles/layout';
+import media from '../../styles/media';
 
-const Section = styled.section`
-  padding: ${({ theme }) => `${theme.spacing.xl} ${theme.spacing.marginDesktop}`};
-  max-width: 1200px;
-  margin: 0 auto;
+const HeroSection = styled(PageSection)`
+  padding-top: ${({ theme }) => theme.spacing.xl};
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: ${({ theme }) => `${theme.spacing.lg} ${theme.spacing.marginMobile}`};
+  ${media.mobile} {
+    min-height: auto;
+    padding-top: ${({ theme }) => theme.spacing.lg};
   }
 `;
 
-const HeroSection = styled(Section)`
+const Grid = styled(ContentContainer)`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: ${({ theme }) => theme.spacing.xl};
   align-items: center;
-  min-height: 70vh;
-  padding-top: ${({ theme }) => theme.spacing.xl};
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
+  ${media.tabletDown} {
     grid-template-columns: 1fr;
-    min-height: auto;
+    gap: ${({ theme }) => theme.spacing.lg};
+  }
+`;
+
+const Copy = styled.div`
+  ${media.mobile} {
+    order: 2;
   }
 `;
 
@@ -44,8 +52,8 @@ const Badge = styled.span`
 
 const Title = styled.h1`
   font-family: ${({ theme }) => theme.fonts.display};
-  font-size: clamp(32px, 5vw, 48px);
-  line-height: 1.15;
+  font-size: ${({ theme }) => theme.typography.displayLg.fontSize};
+  line-height: ${({ theme }) => theme.typography.displayLg.lineHeight};
   font-weight: 700;
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing.md};
@@ -58,6 +66,10 @@ const Subtitle = styled.p`
   color: ${({ theme }) => theme.colors.onSurfaceVariant};
   margin-bottom: ${({ theme }) => theme.spacing.lg};
   max-width: 520px;
+
+  ${media.tabletDown} {
+    max-width: 100%;
+  }
 `;
 
 const CtaRow = styled.div`
@@ -75,6 +87,7 @@ const PrimaryCta = styled(Link)`
   padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.lg}`};
   border-radius: ${({ theme }) => theme.radii.md};
   font-weight: 600;
+  min-height: 44px;
 
   &:hover {
     opacity: 0.92;
@@ -86,12 +99,18 @@ const HeroVisual = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.outlineVariant};
   border-radius: ${({ theme }) => theme.radii.xl};
   padding: ${({ theme }) => theme.spacing.lg};
-  min-height: 320px;
+  min-height: 280px;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   overflow: hidden;
+
+  ${media.mobile} {
+    order: 1;
+    min-height: 220px;
+    padding: ${({ theme }) => theme.spacing.md};
+  }
 
   &::before {
     content: '';
@@ -118,28 +137,30 @@ export default function Hero() {
 
   return (
     <HeroSection ref={ref}>
-      <div>
-        <Badge data-hero>MATH 466 · Optimization II</Badge>
-        <Title data-hero>Master Linear Programming with Interactive Tools</Title>
-        <Subtitle data-hero>
-          LP Grapher combines course explainers, practice questions, and always-available graphing,
-          calculator, and step-by-step solver tools — built from the KNUST MATH 466 curriculum.
-        </Subtitle>
-        <CtaRow data-hero>
-          <PrimaryCta to={ROUTES.learn}>
-            Explore Topics <ArrowRight size={18} />
-          </PrimaryCta>
-        </CtaRow>
-      </div>
-      <HeroVisual data-hero>
-        <svg viewBox="0 0 400 280" fill="none">
-          <line x1="0" y1="140" x2="400" y2="140" stroke="#45464e" strokeWidth="1.5" opacity="0.4" />
-          <line x1="200" y1="0" x2="200" y2="280" stroke="#45464e" strokeWidth="1.5" opacity="0.4" />
-          <path d="M 40 220 L 120 60 L 200 140 L 360 40" stroke="#006a66" strokeWidth="3" fill="none" />
-          <path d="M 80 260 Q 200 20 320 200" stroke="#d81b60" strokeWidth="3" fill="none" />
-          <polygon points="120,60 200,140 80,200" fill="rgba(0,106,102,0.12)" stroke="#006a66" strokeWidth="1.5" strokeDasharray="6 4" />
-        </svg>
-      </HeroVisual>
+      <Grid>
+        <Copy>
+          <Badge data-hero>MATH 466 · Optimization II</Badge>
+          <Title data-hero>Master Linear Programming with Interactive Tools</Title>
+          <Subtitle data-hero>
+            LP Grapher combines course explainers, practice questions, and always-available graphing,
+            calculator, and step-by-step solver tools — built from the KNUST MATH 466 curriculum.
+          </Subtitle>
+          <CtaRow data-hero>
+            <PrimaryCta to={ROUTES.learn}>
+              Explore Topics <ArrowRight size={18} />
+            </PrimaryCta>
+          </CtaRow>
+        </Copy>
+        <HeroVisual data-hero>
+          <svg viewBox="0 0 400 280" fill="none">
+            <line x1="0" y1="140" x2="400" y2="140" stroke="#45464e" strokeWidth="1.5" opacity="0.4" />
+            <line x1="200" y1="0" x2="200" y2="280" stroke="#45464e" strokeWidth="1.5" opacity="0.4" />
+            <path d="M 40 220 L 120 60 L 200 140 L 360 40" stroke="#006a66" strokeWidth="3" fill="none" />
+            <path d="M 80 260 Q 200 20 320 200" stroke="#d81b60" strokeWidth="3" fill="none" />
+            <polygon points="120,60 200,140 80,200" fill="rgba(0,106,102,0.12)" stroke="#006a66" strokeWidth="1.5" strokeDasharray="6 4" />
+          </svg>
+        </HeroVisual>
+      </Grid>
     </HeroSection>
   );
 }

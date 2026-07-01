@@ -59,12 +59,25 @@ export const fonts = {
 };
 
 export const typography = {
-  displayLg: { fontSize: '48px', lineHeight: '56px', fontWeight: 700, letterSpacing: '-0.02em' },
-  headlineMd: { fontSize: '32px', lineHeight: '40px', fontWeight: 600 },
-  headlineSm: { fontSize: '24px', lineHeight: '32px', fontWeight: 600 },
+  displayLg: {
+    fontSize: 'clamp(2rem, 5vw, 3rem)',
+    lineHeight: '1.15',
+    fontWeight: 700,
+    letterSpacing: '-0.02em',
+  },
+  headlineMd: {
+    fontSize: 'clamp(1.5rem, 3.5vw, 2rem)',
+    lineHeight: '1.25',
+    fontWeight: 600,
+  },
+  headlineSm: {
+    fontSize: 'clamp(1.125rem, 2.5vw, 1.5rem)',
+    lineHeight: '1.3',
+    fontWeight: 600,
+  },
   bodyLg: { fontSize: '18px', lineHeight: '28px', fontWeight: 400 },
   bodyMd: { fontSize: '16px', lineHeight: '24px', fontWeight: 400 },
-  equation: { fontSize: '22px', lineHeight: '32px', fontWeight: 400 },
+  equation: { fontSize: 'clamp(1rem, 2.5vw, 1.375rem)', lineHeight: '1.45', fontWeight: 400 },
   labelCaps: { fontSize: '12px', lineHeight: '16px', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' },
   mono: { fontSize: '14px', lineHeight: '20px', fontWeight: 400 },
 };
@@ -77,6 +90,7 @@ export const spacing = {
   xl: '40px',
   gutter: '16px',
   marginMobile: '16px',
+  marginTablet: '24px',
   marginDesktop: '32px',
 };
 
@@ -94,10 +108,18 @@ export const shadows = {
 };
 
 export const breakpoints = {
+  sm: '480px',
   md: '768px',
   lg: '1024px',
   xl: '1280px',
 };
 
-const theme = { colors, fonts, typography, spacing, radii, shadows, breakpoints };
+export const devices = {
+  mobile: '767px',
+  tabletMin: '768px',
+  tabletMax: '1023px',
+  desktop: '1024px',
+};
+
+const theme = { colors, fonts, typography, spacing, radii, shadows, breakpoints, devices };
 export default theme;

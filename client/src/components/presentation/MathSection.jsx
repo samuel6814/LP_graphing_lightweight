@@ -3,6 +3,10 @@ import MathBlock from './MathBlock';
 
 const Section = styled.section`
   margin-bottom: ${({ theme }) => theme.spacing.xl};
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `;
 
 const Heading = styled.h3`
@@ -10,6 +14,7 @@ const Heading = styled.h3`
   font-size: ${({ theme }) => theme.typography.headlineSm.fontSize};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing.md};
+  line-height: 1.3;
 `;
 
 const Body = styled.p`

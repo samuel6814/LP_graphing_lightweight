@@ -1,15 +1,15 @@
 import styled from 'styled-components';
 import { useGsapReveal } from '../../hooks/useGsapReveal';
+import { PageSection, ContentContainer } from '../../styles/layout';
+import media from '../../styles/media';
 
-const Section = styled.section`
-  padding: ${({ theme }) => `${theme.spacing.xl} ${theme.spacing.marginDesktop}`};
+const Section = styled(PageSection)`
   background: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.onPrimary};
 `;
 
-const Inner = styled.div`
+const Inner = styled(ContentContainer)`
   max-width: 900px;
-  margin: 0 auto;
   text-align: center;
 `;
 
@@ -24,8 +24,9 @@ const Steps = styled.div`
   grid-template-columns: repeat(3, 1fr);
   gap: ${({ theme }) => theme.spacing.lg};
 
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  ${media.tabletDown} {
     grid-template-columns: 1fr;
+    gap: ${({ theme }) => theme.spacing.md};
   }
 `;
 
@@ -37,14 +38,14 @@ const Step = styled.div`
 
 const Num = styled.div`
   font-family: ${({ theme }) => theme.fonts.display};
-  font-size: 32px;
+  font-size: clamp(1.5rem, 4vw, 2rem);
   font-weight: 700;
   color: ${({ theme }) => theme.colors.secondaryContainer};
   margin-bottom: ${({ theme }) => theme.spacing.sm};
 `;
 
 const StepTitle = styled.h3`
-  font-size: 18px;
+  font-size: ${({ theme }) => theme.typography.headlineSm.fontSize};
   margin-bottom: ${({ theme }) => theme.spacing.sm};
 `;
 

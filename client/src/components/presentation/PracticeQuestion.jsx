@@ -1,11 +1,17 @@
 import { useState } from 'react';
 import styled from 'styled-components';
+import media from '../../styles/media';
 
 const Card = styled.div`
   background: ${({ theme }) => theme.colors.surfaceContainerLowest};
   border: 1px solid ${({ theme }) => theme.colors.outlineVariant};
   border-radius: ${({ theme }) => theme.radii.xl};
   padding: ${({ theme }) => theme.spacing.lg};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+
+  ${media.mobile} {
+    padding: ${({ theme }) => theme.spacing.md};
+  }
 `;
 
 const Title = styled.h4`
@@ -18,6 +24,13 @@ const Title = styled.h4`
 const Prompt = styled.p`
   margin-bottom: ${({ theme }) => theme.spacing.md};
   font-size: ${({ theme }) => theme.typography.bodyLg.fontSize};
+  line-height: 1.5;
+`;
+
+const ButtonRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.sm};
 `;
 
 const Button = styled.button`
@@ -29,11 +42,17 @@ const Button = styled.button`
   letter-spacing: ${({ theme }) => theme.typography.labelCaps.letterSpacing};
   text-transform: uppercase;
   font-weight: 600;
-  margin-right: ${({ theme }) => theme.spacing.sm};
-  margin-bottom: ${({ theme }) => theme.spacing.sm};
+  min-height: 44px;
 
   &:hover {
     opacity: 0.9;
+  }
+
+  ${media.mobile} {
+    flex: 1 1 100%;
+    justify-content: center;
+    display: flex;
+    align-items: center;
   }
 `;
 
@@ -48,6 +67,8 @@ const Answer = styled.div`
   padding: ${({ theme }) => theme.spacing.md};
   background: ${({ theme }) => theme.colors.surfaceContainer};
   border-radius: ${({ theme }) => theme.radii.md};
+  font-size: ${({ theme }) => theme.typography.bodyMd.fontSize};
+  line-height: 1.5;
 `;
 
 export default function PracticeQuestion({ question, onShowSteps }) {
@@ -57,7 +78,7 @@ export default function PracticeQuestion({ question, onShowSteps }) {
     <Card>
       <Title>Practice Question</Title>
       <Prompt>{question.prompt}</Prompt>
-      <div>
+      <ButtonRow>
         <Button type="button" onClick={() => setRevealed(true)}>
           Reveal Answer
         </Button>
@@ -66,7 +87,7 @@ export default function PracticeQuestion({ question, onShowSteps }) {
             Show Steps in Solver
           </SecondaryBtn>
         )}
-      </div>
+      </ButtonRow>
       {revealed && (
         <Answer>
           <p>{question.answer}</p>

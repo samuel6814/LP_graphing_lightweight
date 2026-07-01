@@ -1,15 +1,10 @@
 import styled from 'styled-components';
 import { LineChart, Calculator, Sparkles } from 'lucide-react';
 import { useGsapReveal } from '../../hooks/useGsapReveal';
+import { PageSection, ContentContainer, ResponsiveGrid } from '../../styles/layout';
 
-const Section = styled.section`
-  padding: ${({ theme }) => `${theme.spacing.xl} ${theme.spacing.marginDesktop}`};
+const Section = styled(PageSection)`
   background: ${({ theme }) => theme.colors.surfaceContainerLow};
-`;
-
-const Inner = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
 `;
 
 const Heading = styled.h2`
@@ -18,16 +13,6 @@ const Heading = styled.h2`
   color: ${({ theme }) => theme.colors.primary};
   text-align: center;
   margin-bottom: ${({ theme }) => theme.spacing.xl};
-`;
-
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: ${({ theme }) => theme.spacing.lg};
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.lg}) {
-    grid-template-columns: 1fr;
-  }
 `;
 
 const Card = styled.div`
@@ -51,7 +36,7 @@ const IconWrap = styled.div`
 
 const CardTitle = styled.h3`
   font-family: ${({ theme }) => theme.fonts.display};
-  font-size: 20px;
+  font-size: ${({ theme }) => theme.typography.headlineSm.fontSize};
   color: ${({ theme }) => theme.colors.primary};
   margin-bottom: ${({ theme }) => theme.spacing.sm};
 `;
@@ -59,6 +44,7 @@ const CardTitle = styled.h3`
 const CardText = styled.p`
   color: ${({ theme }) => theme.colors.onSurfaceVariant};
   line-height: 1.6;
+  font-size: ${({ theme }) => theme.typography.bodyMd.fontSize};
 `;
 
 const FEATURES = [
@@ -84,9 +70,9 @@ export default function Features() {
 
   return (
     <Section ref={ref}>
-      <Inner>
+      <ContentContainer>
         <Heading data-reveal>Everything you need to learn LP</Heading>
-        <Grid>
+        <ResponsiveGrid $cols={3}>
           {FEATURES.map(({ icon: Icon, title, text }) => (
             <Card key={title} data-reveal>
               <IconWrap>
@@ -96,8 +82,8 @@ export default function Features() {
               <CardText>{text}</CardText>
             </Card>
           ))}
-        </Grid>
-      </Inner>
+        </ResponsiveGrid>
+      </ContentContainer>
     </Section>
   );
 }
