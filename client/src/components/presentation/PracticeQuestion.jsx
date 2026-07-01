@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import styled from 'styled-components';
+import MathText from './MathText';
 import media from '../../styles/media';
 
 const Card = styled.div`
@@ -21,7 +22,7 @@ const Title = styled.h4`
   margin-bottom: ${({ theme }) => theme.spacing.md};
 `;
 
-const Prompt = styled.p`
+const PromptWrap = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing.md};
   font-size: ${({ theme }) => theme.typography.bodyLg.fontSize};
   line-height: 1.5;
@@ -77,7 +78,9 @@ export default function PracticeQuestion({ question, onShowSteps }) {
   return (
     <Card>
       <Title>Practice Question</Title>
-      <Prompt>{question.prompt}</Prompt>
+      <PromptWrap>
+        <MathText as="p">{question.prompt}</MathText>
+      </PromptWrap>
       <ButtonRow>
         <Button type="button" onClick={() => setRevealed(true)}>
           Reveal Answer
@@ -90,7 +93,7 @@ export default function PracticeQuestion({ question, onShowSteps }) {
       </ButtonRow>
       {revealed && (
         <Answer>
-          <p>{question.answer}</p>
+          <MathText as="p">{question.answer}</MathText>
         </Answer>
       )}
     </Card>

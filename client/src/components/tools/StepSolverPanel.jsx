@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { CheckCircle } from 'lucide-react';
 import { useTools } from '../../context/ToolsContext';
+import MathText from '../presentation/MathText';
 import media from '../../styles/media';
 
 const Panel = styled.div`
@@ -75,7 +76,7 @@ const StepTitle = styled.h4`
   font-size: ${({ theme }) => theme.typography.bodyMd.fontSize};
 `;
 
-const StepDetail = styled.p`
+const StepDetail = styled.div`
   color: ${({ theme }) => theme.colors.onSurfaceVariant};
   font-size: ${({ theme }) => theme.typography.bodyMd.fontSize};
   line-height: 1.5;
@@ -104,8 +105,16 @@ export default function StepSolverPanel() {
               <Dot>
                 <CheckCircle size={14} />
               </Dot>
-              <StepTitle>{step.title}</StepTitle>
-              <StepDetail>{step.detail}</StepDetail>
+              <StepTitle>
+                {step.title?.includes('$') ? (
+                  <MathText as="span">{step.title}</MathText>
+                ) : (
+                  step.title
+                )}
+              </StepTitle>
+              <StepDetail>
+                <MathText as="span">{step.detail}</MathText>
+              </StepDetail>
             </Step>
           ))}
         </Timeline>

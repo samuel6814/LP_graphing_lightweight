@@ -1,15 +1,7 @@
 /**
  * MATH 466 topic content — explainers, practice questions, solver steps.
+ * Inline math uses $...$ delimiters rendered by MathText.
  */
-
-const shared = {
-  intro: (title, bullets) => ({
-    sections: [
-      { heading: title, plain: bullets.join(' ') },
-      ...bullets.map((b) => ({ plain: b })),
-    ],
-  }),
-};
 
 export const topicContent = {
   'intro-to-linear-programming': {
@@ -52,17 +44,17 @@ export const topicContent = {
         },
         {
           math: 'S = \\{ (x_1,\\ldots,x_n) : \\text{all constraints hold} \\}',
-          plain: 'The set S is the feasible region. Graphically (two variables), S is a polygon or unbounded region.',
+          plain: 'The set $S$ is the feasible region. Graphically (two variables), $S$ is a polygon or unbounded region.',
         },
       ],
     },
     practice: [
       {
-        prompt: 'A point lies inside the feasible region but does not maximize Z. Is it optimal?',
+        prompt: 'A point lies inside the feasible region but does not maximize $Z$. Is it optimal?',
         answer: 'No. It is feasible but not optimal unless it achieves the best objective value.',
         steps: [
           { title: 'Feasible check', detail: 'The point satisfies all constraints.' },
-          { title: 'Optimality', detail: 'Another feasible point yields a higher Z, so it is not optimal.' },
+          { title: 'Optimality', detail: 'Another feasible point yields a higher $Z$, so it is not optimal.' },
         ],
       },
     ],
@@ -73,22 +65,22 @@ export const topicContent = {
       sections: [
         {
           heading: 'General LP Model',
-          math: '\\begin{aligned} \\text{Optimize } & Z = \\sum_{j=1}^{n} c_j x_j \\\\ \\text{s.t. } & \\sum_{j=1}^{n} a_{ij} x_j \\; (\\leq, =, \\geq) \\; b_i, \\quad i=1,\\ldots,m \\\\ & x_j \\geq 0 \\end{aligned}',
+          math: '\\begin{aligned} \\text{Optimize } & Z = \\sum_{j=1}^{n} c_j x_j \\\\ \\text{s.t. } & \\sum_{j=1}^{n} a_{ij} x_j \\in \\{\\leq, =, \\geq\\} b_i, \\quad i=1,\\ldots,m \\\\ & x_j \\geq 0 \\end{aligned}',
         },
         {
           plain:
-            'Decision variables xj represent quantities to determine. Coefficients cj are per-unit profit or cost. Constraints limit resources.',
+            'Decision variables $x_j$ represent quantities to determine. Coefficients $c_j$ are per-unit profit or cost. Constraints limit resources.',
         },
       ],
     },
     practice: [
       {
-        prompt: 'Write the compact LP form for maximizing Z = 3x₁ + 5x₂ with x₁ + 2x₂ ≤ 8 and x₁, x₂ ≥ 0.',
-        answer: 'Max Z = 3x₁ + 5x₂ s.t. x₁ + 2x₂ ≤ 8, x₁, x₂ ≥ 0.',
+        prompt: 'Write the compact LP form for maximizing $Z = 3x_1 + 5x_2$ with $x_1 + 2x_2 \\leq 8$ and $x_1, x_2 \\geq 0$.',
+        answer: '$\\max Z = 3x_1 + 5x_2$ s.t. $x_1 + 2x_2 \\leq 8$, $x_1, x_2 \\geq 0$.',
         steps: [
-          { title: 'Objective', detail: 'Maximize Z = 3x₁ + 5x₂' },
-          { title: 'Constraint', detail: 'x₁ + 2x₂ ≤ 8' },
-          { title: 'Non-negativity', detail: 'x₁, x₂ ≥ 0' },
+          { title: 'Objective', detail: 'Maximize $Z = 3x_1 + 5x_2$' },
+          { title: 'Constraint', detail: '$x_1 + 2x_2 \\leq 8$' },
+          { title: 'Non-negativity', detail: '$x_1, x_2 \\geq 0$' },
         ],
       },
     ],
@@ -100,19 +92,19 @@ export const topicContent = {
         {
           heading: 'Coefficients & Resources',
           plain:
-            'cj = profit/cost per unit of xj. aij = amount of resource i used per unit of activity j. bi = total availability of resource i.',
+            '$c_j$ = profit/cost per unit of $x_j$. $a_{ij}$ = amount of resource $i$ used per unit of activity $j$. $b_i$ = total availability of resource $i$.',
         },
         {
           math: 'a_{ij} x_j \\leq b_i',
-          plain: 'If bi < 0, multiply the constraint by −1 to obtain bi > 0 and reverse the inequality.',
+          plain: 'If $b_i < 0$, multiply the constraint by $-1$ to obtain $b_i > 0$ and reverse the inequality.',
         },
       ],
     },
     practice: [
       {
-        prompt: 'In 2x₁ + 3x₂ ≤ 12, what is b₁ if this is resource 1?',
-        answer: 'b₁ = 12 (right-hand side availability).',
-        steps: [{ title: 'Identify RHS', detail: 'bᵢ is the value on the right of the inequality.' }],
+        prompt: 'In $2x_1 + 3x_2 \\leq 12$, what is $b_1$ if this is resource 1?',
+        answer: '$b_1 = 12$ (right-hand side availability).',
+        steps: [{ title: 'Identify RHS', detail: '$b_i$ is the value on the right of the inequality.' }],
       },
     ],
   },
@@ -121,23 +113,23 @@ export const topicContent = {
     explainer: {
       sections: [
         {
-          heading: 'Graphing ax + by ≥ c',
+          heading: 'Graphing $ax + by \\geq c$',
           plain:
             'Replace the inequality with equality to draw the boundary line. Use a test point (often the origin) to determine which half-plane satisfies the inequality.',
         },
         {
           math: '2x + 3y \\geq 6',
-          plain: 'Origin test: 2(0)+3(0) ≥ 6 is false, so shade away from the origin.',
+          plain: 'Origin test: $2(0)+3(0) \\geq 6$ is false, so shade away from the origin.',
         },
       ],
     },
     practice: [
       {
-        prompt: 'For 2x + 3y ≥ 6, does (0,0) lie in the solution set?',
-        answer: 'No, because 0 ≥ 6 is false.',
+        prompt: 'For $2x + 3y \\geq 6$, does $(0,0)$ lie in the solution set?',
+        answer: 'No, because $0 \\geq 6$ is false.',
         steps: [
-          { title: 'Substitute', detail: '2(0) + 3(0) = 0' },
-          { title: 'Compare', detail: '0 ≥ 6 is false' },
+          { title: 'Substitute', detail: '$2(0) + 3(0) = 0$' },
+          { title: 'Compare', detail: '$0 \\geq 6$ is false' },
         ],
       },
     ],
@@ -159,10 +151,10 @@ export const topicContent = {
     },
     practice: [
       {
-        prompt: 'Point (3,3): is it feasible for 4x+3y≥12 and x−y≤0?',
-        answer: 'No. It satisfies 4x+3y≥12 but violates x−y≤0 since 3−3=0≤0 holds — actually (3,3) satisfies both. Try (4,1): 4(4)+3(1)=19≥12 ✓, 4−1=3≤0 ✗.',
+        prompt: 'Point $(3,3)$: is it feasible for $4x+3y\\geq12$ and $x-y\\leq0$?',
+        answer: 'No. Try $(4,1)$: $4(4)+3(1)=19\\geq12$ ✓, but $4-1=3\\not\\leq0$ ✗.',
         steps: [
-          { title: 'Test (4,1)', detail: 'First constraint OK; second fails.' },
+          { title: 'Test $(4,1)$', detail: 'First constraint OK; second fails.' },
         ],
       },
     ],
@@ -178,14 +170,14 @@ export const topicContent = {
         },
         {
           math: '\\text{Max } Z = 70x_1 + 50x_2 \\quad \\text{(tables and chairs example)}',
-          plain: 'Furniture example: x₁ tables, x₂ chairs; carpentry and painting hour limits.',
+          plain: 'Furniture example: $x_1$ tables, $x_2$ chairs; carpentry and painting hour limits.',
         },
       ],
     },
     practice: [
       {
         prompt: 'A firm makes products A and B. Define decision variables.',
-        answer: 'Let x₁ = units of A, x₂ = units of B (or x and y).',
+        answer: 'Let $x_1$ = units of A, $x_2$ = units of B (or $x$ and $y$).',
         steps: [{ title: 'Step 1', detail: 'Name each unknown quantity to decide.' }],
       },
     ],
@@ -221,20 +213,20 @@ export const topicContent = {
         {
           heading: 'Isoprofit Lines',
           plain:
-            'Plot c₁x₁ + c₂x₂ = k for various k. Parallel lines represent equal profit. Slide outward (max) until the last point touching the feasible region.',
+            'Plot $c_1 x_1 + c_2 x_2 = k$ for various $k$. Parallel lines represent equal profit. Slide outward (max) until the last point touching the feasible region.',
         },
         {
           math: '4x + 3y = k',
-          plain: 'Increase k to improve profit; the last feasible touch point is optimal.',
+          plain: 'Increase $k$ to improve profit; the last feasible touch point is optimal.',
         },
       ],
     },
     practice: [
       {
-        prompt: 'For max Z=4x+3y, what is the slope of an isoprofit line?',
-        answer: 'Rewrite 4x+3y=k as y = k/3 − (4/3)x, slope = −4/3.',
+        prompt: 'For $\\max Z=4x+3y$, what is the slope of an isoprofit line?',
+        answer: 'Rewrite $4x+3y=k$ as $y = k/3 - (4/3)x$, slope $= -4/3$.',
         steps: [
-          { title: 'Solve for y', detail: 'y = −(4/3)x + k/3' },
+          { title: 'Solve for $y$', detail: '$y = -(4/3)x + k/3$' },
         ],
       },
     ],
@@ -246,17 +238,17 @@ export const topicContent = {
         {
           heading: 'Graphical Procedure',
           plain:
-            '1) Graph constraints and find feasible region. 2) Identify extreme points. 3) Evaluate Z at each corner. 4) Select the best.',
+            '1) Graph constraints and find feasible region. 2) Identify extreme points. 3) Evaluate $Z$ at each corner. 4) Select the best.',
         },
       ],
     },
     practice: [
       {
-        prompt: 'Max Z=5x+4y s.t. x,y≥0, 2x+y≤10, x+2y≤10. Which corner gives Z=26?',
-        answer: '(2,4): Z=5(2)+4(4)=26. Verify it is feasible and compare with other corners.',
+        prompt: '$\\max Z=5x+4y$ s.t. $x,y\\geq0$, $2x+y\\leq10$, $x+2y\\leq10$. Which corner gives $Z=26$?',
+        answer: '$(2,4)$: $Z=5(2)+4(4)=26$. Verify it is feasible and compare with other corners.',
         steps: [
-          { title: 'Corners', detail: '(0,0), (5,0), (0,5), (2,4)' },
-          { title: 'Evaluate', detail: 'Z(2,4)=26 is largest among feasible corners.' },
+          { title: 'Corners', detail: '$(0,0)$, $(5,0)$, $(0,5)$, $(2,4)$' },
+          { title: 'Evaluate', detail: '$Z(2,4)=26$ is largest among feasible corners.' },
         ],
       },
     ],
@@ -268,7 +260,7 @@ export const topicContent = {
         {
           heading: 'Standard Form',
           plain:
-            'Convert inequalities to equalities: ≤ adds slack (+), ≥ adds surplus (−) and often artificial variables for an initial BFS.',
+            'Convert inequalities to equalities: $\\leq$ adds slack ($+$), $\\geq$ adds surplus ($-$) and often artificial variables for an initial BFS.',
         },
         {
           math: 'a_1 x_1 + \\cdots + a_n x_n + s = b, \\quad s \\geq 0',
@@ -277,9 +269,9 @@ export const topicContent = {
     },
     practice: [
       {
-        prompt: 'Convert x₁ + 2x₂ ≤ 8 to equality.',
-        answer: 'x₁ + 2x₂ + s₁ = 8, s₁ ≥ 0.',
-        steps: [{ title: 'Add slack', detail: 's₁ = 8 − x₁ − 2x₂ ≥ 0' }],
+        prompt: 'Convert $x_1 + 2x_2 \\leq 8$ to equality.',
+        answer: '$x_1 + 2x_2 + s_1 = 8$, $s_1 \\geq 0$.',
+        steps: [{ title: 'Add slack', detail: '$s_1 = 8 - x_1 - 2x_2 \\geq 0$' }],
       },
     ],
   },
@@ -290,7 +282,7 @@ export const topicContent = {
         {
           heading: 'Simplex Method',
           plain:
-            'Start at a basic feasible solution. Compute cj − zj. If all ≤ 0 (max), stop. Else enter the most positive column, pivot to a new BFS, repeat.',
+            'Start at a basic feasible solution. Compute $c_j - z_j$. If all $\\leq 0$ (max), stop. Else enter the most positive column, pivot to a new BFS, repeat.',
         },
         {
           math: 'c_j - z_j \\leq 0 \\;\\forall j \\Rightarrow \\text{optimal}',
@@ -299,8 +291,8 @@ export const topicContent = {
     },
     practice: [
       {
-        prompt: 'At optimality for a maximization problem, what sign must cj − zj have?',
-        answer: 'All cj − zj ≤ 0 (no improving entering variable).',
+        prompt: 'At optimality for a maximization problem, what sign must $c_j - z_j$ have?',
+        answer: 'All $c_j - z_j \\leq 0$ (no improving entering variable).',
         steps: [{ title: 'Optimality test', detail: 'Non-positive reduced costs for max.' }],
       },
     ],
@@ -318,8 +310,8 @@ export const topicContent = {
     },
     practice: [
       {
-        prompt: 'Max x+y with x−y≥1, x,y≥0 — bounded or unbounded?',
-        answer: 'Unbounded. Feasible ray e.g. (1+t, t) for t≥0 gives x+y=1+2t → ∞.',
+        prompt: '$\\max\\; x+y$ with $x-y\\geq1$, $x,y\\geq0$ — bounded or unbounded?',
+        answer: 'Unbounded. Feasible ray e.g. $(1+t, t)$ for $t\\geq0$ gives $x+y=1+2t \\to \\infty$.',
         steps: [{ title: 'Construct ray', detail: 'Objective increases along feasible direction.' }],
       },
     ],
@@ -339,7 +331,7 @@ export const topicContent = {
       {
         prompt: 'What is a degenerate BFS?',
         answer: 'A basic feasible solution where at least one basic variable is zero.',
-        steps: [{ title: 'Definition', detail: 'More than n constraints active at a point in Rⁿ.' }],
+        steps: [{ title: 'Definition', detail: 'More than $n$ constraints active at a point in $\\mathbb{R}^n$.' }],
       },
     ],
   },
@@ -360,7 +352,7 @@ export const topicContent = {
     practice: [
       {
         prompt: 'Why introduce artificial variables?',
-        answer: 'To obtain an initial basic feasible solution when ≥ or = constraints lack slack variables.',
+        answer: 'To obtain an initial basic feasible solution when $\\geq$ or $=$ constraints lack slack variables.',
         steps: [{ title: 'Purpose', detail: 'Start simplex when no obvious BFS exists.' }],
       },
     ],
@@ -372,13 +364,13 @@ export const topicContent = {
         {
           heading: 'Two-Phase Simplex',
           plain:
-            'Phase I: minimize sum of artificial variables. If optimum > 0, infeasible. Phase II: optimize real objective, dropping artificial columns.',
+            'Phase I: minimize sum of artificial variables. If optimum $> 0$, infeasible. Phase II: optimize real objective, dropping artificial columns.',
         },
       ],
     },
     practice: [
       {
-        prompt: 'Phase I ends with W*=0 and no artificials in basis. What next?',
+        prompt: 'Phase I ends with $W^*=0$ and no artificials in basis. What next?',
         answer: 'Proceed to Phase II with the original objective function.',
         steps: [
           { title: 'Feasible', detail: 'Artificials driven to zero — feasible starting tableau.' },
@@ -402,9 +394,9 @@ export const topicContent = {
     },
     practice: [
       {
-        prompt: 'Primal has ≤ constraints and is a maximization. Dual constraint direction?',
-        answer: 'Dual uses ≥ constraints (and dual is a minimization).',
-        steps: [{ title: 'Rule (3)', detail: '≤ in primal becomes ≥ in dual.' }],
+        prompt: 'Primal has $\\leq$ constraints and is a maximization. Dual constraint direction?',
+        answer: 'Dual uses $\\geq$ constraints (and dual is a minimization).',
+        steps: [{ title: 'Rule (3)', detail: '$\\leq$ in primal becomes $\\geq$ in dual.' }],
       },
     ],
   },
@@ -415,7 +407,7 @@ export const topicContent = {
         {
           heading: 'Post-Optimality Analysis',
           plain:
-            'Sensitivity analysis finds ranges for cj and bi over which the current optimal basis remains optimal.',
+            'Sensitivity analysis finds ranges for $c_j$ and $b_i$ over which the current optimal basis remains optimal.',
         },
       ],
     },
@@ -434,7 +426,7 @@ export const topicContent = {
         {
           heading: 'Transportation Problem',
           plain:
-            'Ship goods from m sources to n destinations minimizing cost. Balanced: total supply = total demand. Use NW corner, least cost, or Vogel method.',
+            'Ship goods from $m$ sources to $n$ destinations minimizing cost. Balanced: total supply = total demand. Use NW corner, least cost, or Vogel method.',
         },
         {
           math: '\\min \\sum_i \\sum_j c_{ij} x_{ij}',
@@ -445,7 +437,7 @@ export const topicContent = {
       {
         prompt: 'When is a transportation problem balanced?',
         answer: 'When total supply equals total demand.',
-        steps: [{ title: 'Balance', detail: 'Σ supply = Σ demand.' }],
+        steps: [{ title: 'Balance', detail: '$\\sum$ supply $= \\sum$ demand.' }],
       },
     ],
   },
@@ -463,7 +455,7 @@ export const topicContent = {
     practice: [
       {
         prompt: 'How does transshipment differ from pure transportation?',
-        answer: 'Goods can flow through intermediate points, not only source → destination.',
+        answer: 'Goods can flow through intermediate points, not only source $\\to$ destination.',
         steps: [{ title: 'Extension', detail: 'Adds transshipment nodes to the network.' }],
       },
     ],
@@ -475,7 +467,7 @@ export const topicContent = {
         {
           heading: 'Assignment Problem',
           plain:
-            'Special balanced transportation with n sources and n destinations, one assignment per row/column. Hungarian method on cost matrix.',
+            'Special balanced transportation with $n$ sources and $n$ destinations, one assignment per row/column. Hungarian method on cost matrix.',
         },
       ],
     },
@@ -483,7 +475,7 @@ export const topicContent = {
       {
         prompt: 'Assignment model: how many assignments per row at optimum?',
         answer: 'Exactly one assignment (one 1) per row and per column.',
-        steps: [{ title: 'Structure', detail: 'n×n binary assignment matrix.' }],
+        steps: [{ title: 'Structure', detail: '$n \\times n$ binary assignment matrix.' }],
       },
     ],
   },

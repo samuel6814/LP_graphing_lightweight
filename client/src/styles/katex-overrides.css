@@ -6,12 +6,12 @@
   -webkit-overflow-scrolling: touch;
 }
 
-.katex {
-  font-size: 1.05em;
+.math-block .katex {
+  font-size: 1.1em;
 }
 
-.math-block {
-  font-family: "Source Serif 4", Georgia, serif;
+.math-text .katex {
+  font-size: 1em;
 }
 
 @media (max-width: 767px) {
