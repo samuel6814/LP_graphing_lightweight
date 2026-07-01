@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MathFlow Pro - Graphing Tool</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&family=Geist:wght@400;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Hanken+Grotesk:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#006a66",
+                    "on-primary-container": "#98a4c9",
+                    "surface-dim": "#ccdbf3",
+                    "tertiary-fixed": "#ffd9de",
+                    "outline": "#75777e",
+                    "on-error-container": "#93000a",
+                    "surface-container-high": "#dce9ff",
+                    "surface-container-highest": "#d5e3fc",
+                    "primary-fixed": "#dae2ff",
+                    "on-secondary": "#ffffff",
+                    "surface": "#f8f9ff",
+                    "tertiary": "#52001e",
+                    "secondary-fixed": "#70f7ef",
+                    "on-background": "#0d1c2e",
+                    "secondary-fixed-dim": "#4edad3",
+                    "on-tertiary-fixed-variant": "#90003b",
+                    "surface-variant": "#d5e3fc",
+                    "on-primary-fixed-variant": "#3a4666",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#233144",
+                    "outline-variant": "#c6c6ce",
+                    "on-surface": "#0d1c2e",
+                    "primary": "#182442",
+                    "on-tertiary-container": "#ff7b99",
+                    "on-secondary-container": "#006f6a",
+                    "inverse-primary": "#bac6ec",
+                    "secondary-container": "#6df4ec",
+                    "on-primary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "surface-container-low": "#eff4ff",
+                    "on-surface-variant": "#45464e",
+                    "on-tertiary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#3f0016",
+                    "on-secondary-fixed": "#00201e",
+                    "surface-bright": "#f8f9ff",
+                    "on-secondary-fixed-variant": "#00504c",
+                    "surface-tint": "#525e7f",
+                    "tertiary-container": "#7a0031",
+                    "primary-container": "#2e3a59",
+                    "tertiary-fixed-dim": "#ffb2bf",
+                    "surface-container": "#e6eeff",
+                    "error-container": "#ffdad6",
+                    "primary-fixed-dim": "#bac6ec",
+                    "on-primary-fixed": "#0d1a38",
+                    "background": "#f8f9ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "unit": "4px",
+                    "md": "16px",
+                    "xl": "40px",
+                    "margin-mobile": "16px",
+                    "sm": "8px",
+                    "gutter": "16px",
+                    "margin-desktop": "32px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Hanken Grotesk"],
+                    "body-md": ["Inter"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "equation-display": ["\"Source Serif 4\""],
+                    "label-caps": ["Geist"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "mono-technical": ["Geist"]
+            },
+            "fontSize": {
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "equation-display": ["22px", {"lineHeight": "32px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "mono-technical": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        .graph-canvas-container {
+            background-image: 
+                linear-gradient(to right, rgba(117, 119, 126, 0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(117, 119, 126, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .graph-canvas-container::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(to right, rgba(117, 119, 126, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(117, 119, 126, 0.05) 1px, transparent 1px);
+            background-size: 8px 8px;
+            pointer-events: none;
+        }
+        .axis-x { border-top: 1.5px solid #45464e; }
+        .axis-y { border-left: 1.5px solid #45464e; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c6c6ce; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden">
+<!-- Desktop Sidebar (Shared SideNavBar) -->
+<nav class="fixed left-0 top-0 bottom-0 z-40 w-[320px] h-full hidden md:flex flex-col bg-surface border-r border-outline-variant transition-colors duration-200 ease-in-out">
+<div class="p-lg">
+<h1 class="font-headline-sm text-headline-sm text-primary font-bold">MathFlow Pro</h1>
+<p class="text-on-surface-variant font-body-md opacity-70">Academic Edition</p>
+</div>
+<div class="flex-1 px-md space-y-unit">
+<a class="flex items-center gap-md p-md rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="calculate">calculate</span>
+<span class="font-body-md">Calculator</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-lg text-primary font-bold border-l-4 border-primary bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="show_chart">show_chart</span>
+<span class="font-body-md">Graphing Tool</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="auto_fix_high">auto_fix_high</span>
+<span class="font-body-md">Step-by-Step Solver</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+</div>
+<div class="p-md border-t border-outline-variant space-y-unit">
+<a class="flex items-center gap-md p-md rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="function">function</span>
+<span class="font-body-md">Constants</span>
+</a>
+<a class="flex items-center gap-md p-md rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md">Settings</span>
+</a>
+<div class="flex items-center gap-md p-md mt-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a female university professor in her late 30s with a warm but focused expression, wearing glasses and a smart academic blazer. The lighting is soft and neutral, in a clean, minimalist university office setting with shelves of mathematics textbooks in the soft-focus background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBddlw_IhD7KNiIGAJ5wXEdF6koIQhci-HpODTdyiy_IxMyY9KfdVTxsVLctjWzB541F6yM8iHF0GcoLTVMCbBIC3CXzaQ28ahSYS4Y9DIklDD1cvgOsSquOKjiXLgi7S6-ERr9meYyeLuwS5pB_H4QHntvtb7T7ncWd1w6281sCj_9W5XUjACvZHtZG8wv6Q-R5D3WoVJSJxCczk9FyeKZICX_EAAlxLaWnvZ0-Pr2HeB1jtzsXg_2QJx_NiWpxlaJgO6G9AUVcBjO"/>
+</div>
+<div class="flex flex-col">
+<span class="text-label-caps font-label-caps text-on-surface">DR. ELARA VANCE</span>
+<span class="text-xs text-on-surface-variant">Mathematics Dept.</span>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="md:ml-[320px] h-screen flex flex-col md:flex-row relative">
+<!-- Function Sidebar (Calculated Layout) -->
+<aside class="w-full md:w-[380px] bg-surface flex flex-col border-r border-outline-variant z-10">
+<!-- Top Bar -->
+<div class="h-16 flex items-center justify-between px-md border-b border-outline-variant bg-surface/80 backdrop-blur-md">
+<span class="font-headline-sm text-headline-sm text-primary font-bold">Expressions</span>
+<button class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+<!-- Function List -->
+<div class="flex-1 overflow-y-auto p-md space-y-md custom-scrollbar">
+<!-- Function Card 1: Sine (Teal Accent) -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<div class="flex">
+<div class="w-1.5 bg-secondary"></div>
+<div class="p-md flex-1">
+<div class="flex items-center justify-between mb-sm">
+<span class="font-mono-technical text-secondary font-bold">f(x)</span>
+<div class="flex items-center gap-sm">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[18px]" data-icon="visibility">visibility</span></button>
+<button class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[18px]" data-icon="close">close</span></button>
+</div>
+</div>
+<div class="font-equation-display text-equation-display text-primary py-xs">
+                                y = sin(x)
+                            </div>
+</div>
+</div>
+</div>
+<!-- Function Card 2: Quadratic (Magenta Accent) -->
+<div class="bg-surface-container-low border border-outline-variant rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+<div class="flex">
+<div class="w-1.5 bg-[#d81b60]"></div> <!-- Magenta Accent -->
+<div class="p-md flex-1">
+<div class="flex items-center justify-between mb-sm">
+<span class="font-mono-technical text-[#d81b60] font-bold">g(x)</span>
+<div class="flex items-center gap-sm">
+<button class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined text-[18px]" data-icon="visibility">visibility</span></button>
+<button class="text-on-surface-variant hover:text-error"><span class="material-symbols-outlined text-[18px]" data-icon="close">close</span></button>
+</div>
+</div>
+<div class="font-equation-display text-equation-display text-primary py-xs">
+                                y = 0.5x² - 4
+                            </div>
+</div>
+</div>
+</div>
+<!-- Active Interaction Card: Slider -->
+<div class="bg-surface-container border-2 border-primary rounded-xl p-md">
+<div class="flex items-center justify-between mb-md">
+<div class="flex items-center gap-sm">
+<span class="font-mono-technical font-bold text-primary italic">k = </span>
+<span class="bg-primary text-on-primary px-2 py-0.5 rounded text-mono-technical">2.45</span>
+</div>
+<span class="material-symbols-outlined text-primary" data-icon="tune">tune</span>
+</div>
+<input class="w-full h-1.5 bg-outline-variant rounded-lg appearance-none cursor-pointer accent-secondary" type="range"/>
+<div class="flex justify-between mt-2 font-mono-technical text-[10px] text-on-surface-variant">
+<span>-10.0</span>
+<span>0.0</span>
+<span>10.0</span>
+</div>
+</div>
+<!-- Placeholder / Empty State for New Function -->
+<div class="border-2 border-dashed border-outline-variant rounded-xl p-md flex items-center justify-center text-on-surface-variant cursor-pointer hover:bg-surface-container-low transition-colors">
+<span class="font-mono-technical text-label-caps">CLICK TO ADD EXPRESSION</span>
+</div>
+</div>
+<!-- Bottom Action Bar -->
+<div class="p-md bg-surface-container-low border-t border-outline-variant space-y-sm">
+<button class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-caps tracking-wider flex items-center justify-center gap-sm hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined" data-icon="table_chart">table_chart</span>
+                    TABLE OF VALUES
+                </button>
+<button class="w-full border border-primary text-primary py-3 rounded-lg font-label-caps tracking-wider flex items-center justify-center gap-sm hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined" data-icon="file_download">file_download</span>
+                    EXPORT PLOT
+                </button>
+</div>
+</aside>
+<!-- Main Graph Canvas (70% on large screens) -->
+<section class="flex-1 relative bg-white overflow-hidden graph-canvas-container flex items-center justify-center">
+<!-- Axes -->
+<div class="absolute w-full h-[1.5px] bg-outline-variant/50 top-1/2 left-0 -translate-y-1/2 axis-x"></div>
+<div class="absolute h-full w-[1.5px] bg-outline-variant/50 left-1/2 top-0 -translate-x-1/2 axis-y"></div>
+<!-- Dummy Plot: Sine Wave (Teal) -->
+<svg class="absolute w-full h-full pointer-events-none" preserveaspectratio="none" viewbox="0 0 1000 1000">
+<path d="M 0 500 Q 125 200 250 500 T 500 500 T 750 500 T 1000 500" fill="none" stroke="#006a66" stroke-width="3"></path>
+</svg>
+<!-- Dummy Plot: Parabola (Magenta) -->
+<svg class="absolute w-full h-full pointer-events-none" preserveaspectratio="none" viewbox="0 0 1000 1000">
+<path d="M 300 0 Q 500 1200 700 0" fill="none" stroke="#d81b60" stroke-width="3"></path>
+</svg>
+<!-- Origin Label -->
+<div class="absolute top-1/2 left-1/2 mt-2 ml-2 font-mono-technical text-xs text-on-surface-variant">(0, 0)</div>
+<!-- Floating Graph Controls (Bottom Right) -->
+<div class="absolute bottom-md right-md flex flex-col gap-sm">
+<div class="bg-surface border border-outline-variant rounded-xl shadow-lg flex flex-col overflow-hidden">
+<button class="p-3 hover:bg-surface-container transition-colors border-b border-outline-variant">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+<button class="p-3 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" data-icon="remove">remove</span>
+</button>
+</div>
+<button class="bg-surface border border-outline-variant rounded-xl shadow-lg p-3 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined" data-icon="center_focus_strong">center_focus_strong</span>
+</button>
+<button class="bg-primary text-on-primary rounded-xl shadow-lg p-3 hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined" data-icon="settings_input_component">settings_input_component</span>
+</button>
+</div>
+<!-- Floating Info Badge (Top Right) -->
+<div class="absolute top-md right-md flex gap-sm">
+<div class="bg-surface/80 backdrop-blur-md border border-outline-variant rounded-full px-4 py-2 flex items-center gap-2 shadow-sm">
+<div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>
+<span class="text-xs font-mono-technical text-on-surface">DEGREE MODE</span>
+</div>
+</div>
+<!-- Coordinate Tooltip Interaction -->
+<div class="absolute pointer-events-none hidden bg-inverse-surface text-inverse-on-surface px-3 py-1 rounded-lg text-xs font-mono-technical shadow-xl" id="coord-tooltip">
+                x: 3.42, y: -0.12
+            </div>
+</section>
+</main>
+<!-- Bottom Navigation (Mobile Only - Shared BottomNavBar) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-2 pt-2 md:hidden bg-surface/80 backdrop-blur-lg border-t border-outline-variant rounded-t-xl shadow-md">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-variant/50 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="calculate">calculate</span>
+<span class="font-label-caps text-[10px]">Calc</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-3 py-1 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="show_chart">show_chart</span>
+<span class="font-label-caps text-[10px]">Graph</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-variant/50 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="auto_fix_high">auto_fix_high</span>
+<span class="font-label-caps text-[10px]">Steps</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 hover:bg-surface-variant/50 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-[10px]">Dash</span>
+</a>
+</nav>
+<!-- Micro-interactions Script -->
+<script>
+        const canvas = document.querySelector('section');
+        const tooltip = document.getElementById('coord-tooltip');
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // Simplified "coordinate" calculation for effect
+            const mathX = ((x - rect.width/2) / 40).toFixed(2);
+            const mathY = (-(y - rect.height/2) / 40).toFixed(2);
+            
+            tooltip.style.left = `${e.clientX - rect.left + 15}px`;
+            tooltip.style.top = `${e.clientY - rect.top + 15}px`;
+            tooltip.innerText = `x: ${mathX}, y: ${mathY}`;
+            tooltip.classList.remove('hidden');
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            tooltip.classList.add('hidden');
+        });
+
+        // Toggle Table View Logic (Visual Only)
+        document.querySelector('button[data-icon="table_chart"]').parentElement.addEventListener('click', () => {
+            alert("Generating analytical data table for selected functions...");
+        });
+    </script>
+</body></html>

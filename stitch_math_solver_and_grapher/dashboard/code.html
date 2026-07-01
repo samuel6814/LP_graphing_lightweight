@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MathFlow Pro - User Dashboard</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;500&amp;family=Geist:wght@400;600&amp;family=Source+Serif+4&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#006a66",
+                        "on-primary-container": "#98a4c9",
+                        "surface-dim": "#ccdbf3",
+                        "tertiary-fixed": "#ffd9de",
+                        "outline": "#75777e",
+                        "on-error-container": "#93000a",
+                        "surface-container-high": "#dce9ff",
+                        "surface-container-highest": "#d5e3fc",
+                        "primary-fixed": "#dae2ff",
+                        "on-secondary": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "tertiary": "#52001e",
+                        "secondary-fixed": "#70f7ef",
+                        "on-background": "#0d1c2e",
+                        "secondary-fixed-dim": "#4edad3",
+                        "on-tertiary-fixed-variant": "#90003b",
+                        "surface-variant": "#d5e3fc",
+                        "on-primary-fixed-variant": "#3a4666",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#233144",
+                        "outline-variant": "#c6c6ce",
+                        "on-surface": "#0d1c2e",
+                        "primary": "#182442",
+                        "on-tertiary-container": "#ff7b99",
+                        "on-secondary-container": "#006f6a",
+                        "inverse-primary": "#bac6ec",
+                        "secondary-container": "#6df4ec",
+                        "on-primary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#eaf1ff",
+                        "surface-container-low": "#eff4ff",
+                        "on-surface-variant": "#45464e",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#3f0016",
+                        "on-secondary-fixed": "#00201e",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#00504c",
+                        "surface-tint": "#525e7f",
+                        "tertiary-container": "#7a0031",
+                        "primary-container": "#2e3a59",
+                        "tertiary-fixed-dim": "#ffb2bf",
+                        "surface-container": "#e6eeff",
+                        "error-container": "#ffdad6",
+                        "primary-fixed-dim": "#bac6ec",
+                        "on-primary-fixed": "#0d1a38",
+                        "background": "#f8f9ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "unit": "4px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "margin-mobile": "16px",
+                        "sm": "8px",
+                        "gutter": "16px",
+                        "margin-desktop": "32px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "equation-display": ["\"Source Serif 4\""],
+                        "label-caps": ["Geist"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "mono-technical": ["Geist"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "equation-display": ["22px", {"lineHeight": "32px", "fontWeight": "400"}],
+                        "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "mono-technical": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .equation-font { font-family: "Source Serif 4", serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #c6c6ce; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- Sidebar Navigation (Desktop) -->
+<aside class="fixed left-0 top-0 bottom-0 z-40 w-[320px] h-full hidden md:flex flex-col bg-surface border-r border-outline-variant font-body-md">
+<div class="p-lg flex flex-col h-full">
+<div class="mb-xl">
+<h1 class="font-headline-sm text-headline-sm text-primary font-bold">MathFlow Pro</h1>
+<p class="text-on-surface-variant text-sm">Academic Edition</p>
+</div>
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-md p-md transition-colors duration-200 ease-in-out text-on-surface-variant hover:bg-surface-container-high rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">calculate</span>
+<span>Calculator</span>
+</a>
+<a class="flex items-center gap-md p-md transition-colors duration-200 ease-in-out text-on-surface-variant hover:bg-surface-container-high rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">show_chart</span>
+<span>Graphing Tool</span>
+</a>
+<a class="flex items-center gap-md p-md transition-colors duration-200 ease-in-out text-on-surface-variant hover:bg-surface-container-high rounded-lg group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary">auto_fix_high</span>
+<span>Step-by-Step Solver</span>
+</a>
+<a class="flex items-center gap-md p-md transition-colors duration-200 ease-in-out text-primary font-bold border-l-4 border-primary bg-surface-container rounded-r-lg group" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span>Dashboard</span>
+</a>
+</nav>
+<div class="mt-auto pt-lg border-t border-outline-variant space-y-2">
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-high rounded-lg group" href="#">
+<span class="material-symbols-outlined">function</span>
+<span class="font-label-caps text-label-caps">Constants</span>
+</a>
+<a class="flex items-center gap-md p-md text-on-surface-variant hover:bg-surface-container-high rounded-lg group" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-caps text-label-caps">Settings</span>
+</a>
+<div class="flex items-center gap-md p-md">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="text-sm font-bold">Alex Johnson</p>
+<p class="text-xs text-on-surface-variant">Pro Plan</p>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Top App Bar (Mobile & Header Context) -->
+<header class="flex justify-between items-center w-full px-md h-16 sticky top-0 z-50 md:pl-[336px] bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-md">
+<button class="md:hidden p-sm">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="hidden md:block">
+<span class="font-headline-sm text-headline-sm font-bold text-primary">Dashboard</span>
+</div>
+</div>
+<div class="flex-1 max-w-xl mx-md hidden lg:block">
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container border-none rounded-full text-body-md focus:ring-2 focus:ring-primary/20 outline-none" placeholder="Search your history..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-sm">
+<button class="p-sm text-on-surface-variant hover:opacity-80 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">history</span>
+</button>
+<button class="p-sm text-on-surface-variant hover:opacity-80 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">help</span>
+</button>
+<div class="h-8 w-px bg-outline-variant mx-2"></div>
+<button class="flex items-center gap-2 p-sm text-primary hover:opacity-80 active:scale-95 transition-transform bg-primary-fixed px-4 rounded-full">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span class="font-label-caps text-label-caps">NEW CALC</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="md:pl-[320px] pb-24 md:pb-lg">
+<div class="p-md md:p-margin-desktop max-w-[1400px] mx-auto">
+<!-- Welcome Header -->
+<div class="mb-lg">
+<h2 class="font-headline-md text-headline-md text-primary mb-1">Academic Overview</h2>
+<p class="text-on-surface-variant font-body-md">Good morning, Alex. You've solved 12 problems this week.</p>
+</div>
+<!-- Dashboard Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Learning Progress (Left / Center) -->
+<div class="lg:col-span-8 space-y-lg">
+<!-- Progress Card -->
+<section class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-headline-sm text-headline-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">analytics</span>
+                                Learning Progress
+                            </h3>
+<select class="bg-surface text-sm border-outline-variant rounded-lg p-1 outline-none">
+<option>Weekly</option>
+<option>Monthly</option>
+</select>
+</div>
+<!-- Simple Bar Chart Placeholder -->
+<div class="h-64 flex items-end justify-between gap-sm pt-4">
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary-fixed hover:bg-primary rounded-t-lg transition-all" style="height: 45%;"></div>
+<span class="text-xs font-mono-technical">Mon</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary-fixed hover:bg-primary rounded-t-lg transition-all" style="height: 60%;"></div>
+<span class="text-xs font-mono-technical">Tue</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary-fixed hover:bg-primary rounded-t-lg transition-all" style="height: 85%;"></div>
+<span class="text-xs font-mono-technical">Wed</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary hover:bg-primary-fixed rounded-t-lg transition-all" style="height: 70%;"></div>
+<span class="text-xs font-mono-technical font-bold">Thu</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary-fixed hover:bg-primary rounded-t-lg transition-all" style="height: 30%;"></div>
+<span class="text-xs font-mono-technical">Fri</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary-fixed hover:bg-primary rounded-t-lg transition-all" style="height: 15%;"></div>
+<span class="text-xs font-mono-technical">Sat</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-2 group">
+<div class="w-full bg-primary-fixed hover:bg-primary rounded-t-lg transition-all" style="height: 10%;"></div>
+<span class="text-xs font-mono-technical">Sun</span>
+</div>
+</div>
+<div class="mt-lg flex gap-xl border-t border-outline-variant pt-md">
+<div>
+<p class="text-on-surface-variant text-xs font-label-caps mb-1">ACCURACY</p>
+<p class="text-lg font-bold">94.2%</p>
+</div>
+<div>
+<p class="text-on-surface-variant text-xs font-label-caps mb-1">TIME SPENT</p>
+<p class="text-lg font-bold">8.4 hrs</p>
+</div>
+</div>
+</section>
+<!-- Recent Problems (Bento Style) -->
+<section>
+<div class="flex justify-between items-center mb-md">
+<h3 class="font-headline-sm text-headline-sm">Recent Problems</h3>
+<button class="text-primary font-label-caps text-label-caps hover:underline">VIEW ALL</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Card 1 -->
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant hover:border-primary transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-4">
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full">CALCULUS</span>
+<span class="text-xs text-on-surface-variant">2h ago</span>
+</div>
+<div class="equation-font text-xl mb-4 text-on-surface">
+                                    ∫ (3x² + 2x - 5) dx
+                                </div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="text-xs flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">check_circle</span> Solved</span>
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-lowest p-md rounded-xl border border-outline-variant hover:border-primary transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-4">
+<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed text-[10px] font-bold rounded-full">ALGEBRA</span>
+<span class="text-xs text-on-surface-variant">5h ago</span>
+</div>
+<div class="equation-font text-xl mb-4 text-on-surface">
+                                    log₂(x + 5) = 3
+                                </div>
+<div class="flex justify-between items-center text-on-surface-variant">
+<span class="text-xs flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">check_circle</span> Solved</span>
+<span class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Saved Graphs & Quick Actions (Right Rail) -->
+<div class="lg:col-span-4 space-y-lg">
+<!-- Saved Graphs Section -->
+<section class="bg-surface-container p-lg rounded-xl flex flex-col">
+<div class="flex justify-between items-center mb-lg">
+<h3 class="font-headline-sm text-headline-sm">Saved Graphs</h3>
+<button class="material-symbols-outlined text-on-surface-variant">more_vert</button>
+</div>
+<div class="space-y-md">
+<!-- Graph Item 1 -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden group">
+<div class="h-32 bg-slate-100 relative overflow-hidden">
+<!-- Simplified Graph Illustration -->
+<div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(circle, #75777e 1px, transparent 1px); background-size: 20px 20px;"></div>
+<svg class="absolute inset-0 w-full h-full p-4" viewbox="0 0 200 100">
+<path d="M0,50 Q50,0 100,50 T200,50" fill="none" stroke="#182442" stroke-width="2"></path>
+</svg>
+<div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors"></div>
+</div>
+<div class="p-md flex justify-between items-center">
+<div>
+<p class="font-bold text-sm">Harmonic Motion</p>
+<p class="text-xs text-on-surface-variant">y = sin(x) + cos(2x)</p>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">open_in_new</button>
+</div>
+</div>
+<!-- Graph Item 2 -->
+<div class="bg-surface-container-lowest rounded-lg border border-outline-variant overflow-hidden group">
+<div class="h-32 bg-slate-100 relative overflow-hidden">
+<div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(circle, #75777e 1px, transparent 1px); background-size: 20px 20px;"></div>
+<svg class="absolute inset-0 w-full h-full p-4" viewbox="0 0 200 100">
+<path d="M20,80 L180,20" fill="none" stroke="#006a66" stroke-width="2"></path>
+</svg>
+<div class="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors"></div>
+</div>
+<div class="p-md flex justify-between items-center">
+<div>
+<p class="font-bold text-sm">Linear Regression</p>
+<p class="text-xs text-on-surface-variant">y = -0.37x + 84</p>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">open_in_new</button>
+</div>
+</div>
+</div>
+<button class="mt-lg w-full py-md border border-outline-variant border-dashed rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors font-label-caps text-label-caps">
+                            + MANAGE ALL GRAPHS
+                        </button>
+</section>
+<!-- Quick Tools -->
+<section class="bg-primary text-on-primary p-lg rounded-xl">
+<h4 class="font-headline-sm text-headline-sm mb-md">Quick Help</h4>
+<div class="grid grid-cols-2 gap-sm">
+<button class="bg-primary-container hover:opacity-90 transition-opacity p-md rounded-lg flex flex-col items-center text-center gap-2">
+<span class="material-symbols-outlined">menu_book</span>
+<span class="text-xs font-label-caps">FORMULAS</span>
+</button>
+<button class="bg-primary-container hover:opacity-90 transition-opacity p-md rounded-lg flex flex-col items-center text-center gap-2">
+<span class="material-symbols-outlined">video_library</span>
+<span class="text-xs font-label-caps">TUTORIALS</span>
+</button>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-2 pt-2 md:hidden bg-surface/80 backdrop-blur-lg border-t border-outline-variant shadow-md">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1" href="#">
+<span class="material-symbols-outlined">calculate</span>
+<span class="font-label-caps text-label-caps">Calc</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1" href="#">
+<span class="material-symbols-outlined">show_chart</span>
+<span class="font-label-caps text-label-caps">Graph</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1" href="#">
+<span class="material-symbols-outlined">auto_fix_high</span>
+<span class="font-label-caps text-label-caps">Steps</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-3 py-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-caps text-label-caps">Dash</span>
+</a>
+</nav>
+<!-- Contextual FAB (Mobile/Desktop Context) -->
+<button class="fixed bottom-24 right-md md:bottom-md md:right-md w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform z-40">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+<script>
+        // Simple micro-interaction for cards
+        document.querySelectorAll('.group').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                // Subtle scale effect or highlight if needed
+            });
+        });
+
+        // Initialize any data-based elements
+        console.log("MathFlow Pro Dashboard Initialized.");
+    </script>
+</body></html>

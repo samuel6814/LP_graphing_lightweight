@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MathFlow Pro - Step-by-Step Solver</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Hanken+Grotesk:wght@600;700;800&family=Geist:wght@400;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Hanken+Grotesk:wght@100..900&family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary": "#006a66",
+                    "on-primary-container": "#98a4c9",
+                    "surface-dim": "#ccdbf3",
+                    "tertiary-fixed": "#ffd9de",
+                    "outline": "#75777e",
+                    "on-error-container": "#93000a",
+                    "surface-container-high": "#dce9ff",
+                    "surface-container-highest": "#d5e3fc",
+                    "primary-fixed": "#dae2ff",
+                    "on-secondary": "#ffffff",
+                    "surface": "#f8f9ff",
+                    "tertiary": "#52001e",
+                    "secondary-fixed": "#70f7ef",
+                    "on-background": "#0d1c2e",
+                    "secondary-fixed-dim": "#4edad3",
+                    "on-tertiary-fixed-variant": "#90003b",
+                    "surface-variant": "#d5e3fc",
+                    "on-primary-fixed-variant": "#3a4666",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#233144",
+                    "outline-variant": "#c6c6ce",
+                    "on-surface": "#0d1c2e",
+                    "primary": "#182442",
+                    "on-tertiary-container": "#ff7b99",
+                    "on-secondary-container": "#006f6a",
+                    "inverse-primary": "#bac6ec",
+                    "secondary-container": "#6df4ec",
+                    "on-primary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "surface-container-low": "#eff4ff",
+                    "on-surface-variant": "#45464e",
+                    "on-tertiary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#3f0016",
+                    "on-secondary-fixed": "#00201e",
+                    "surface-bright": "#f8f9ff",
+                    "on-secondary-fixed-variant": "#00504c",
+                    "surface-tint": "#525e7f",
+                    "tertiary-container": "#7a0031",
+                    "primary-container": "#2e3a59",
+                    "tertiary-fixed-dim": "#ffb2bf",
+                    "surface-container": "#e6eeff",
+                    "error-container": "#ffdad6",
+                    "primary-fixed-dim": "#bac6ec",
+                    "on-primary-fixed": "#0d1a38",
+                    "background": "#f8f9ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "xs": "4px",
+                    "unit": "4px",
+                    "md": "16px",
+                    "xl": "40px",
+                    "margin-mobile": "16px",
+                    "sm": "8px",
+                    "gutter": "16px",
+                    "margin-desktop": "32px",
+                    "lg": "24px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Hanken Grotesk"],
+                    "body-md": ["Inter"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "equation-display": ["Source Serif 4"],
+                    "label-caps": ["Geist"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "mono-technical": ["Geist"]
+            },
+            "fontSize": {
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "equation-display": ["22px", {"lineHeight": "32px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-md": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "mono-technical": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            user-select: none;
+        }
+        .equation-font { font-family: "Source Serif 4", serif; }
+        .solution-path-line {
+            position: absolute;
+            left: 23px;
+            top: 40px;
+            bottom: -24px;
+            width: 2px;
+            background: repeating-linear-gradient(to bottom, #75777e 0, #75777e 4px, transparent 4px, transparent 8px);
+        }
+        .step-card:last-child .solution-path-line {
+            display: none;
+        }
+        .glow-subtle {
+            box-shadow: 0 0 20px rgba(24, 36, 66, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Top Navigation Anchor (Shared Component) -->
+<header class="flex justify-between items-center w-full px-md h-16 sticky top-0 z-50 md:pl-[336px] bg-surface/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex items-center gap-4">
+<span class="md:hidden material-symbols-outlined text-primary cursor-pointer">menu</span>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">calculate</span>
+<span class="font-headline-sm text-headline-sm font-bold text-primary">MathFlow</span>
+</div>
+</div>
+<div class="hidden md:flex flex-1 max-w-xl mx-xl px-md py-xs bg-surface-container rounded-full items-center gap-sm">
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-md w-full" placeholder="Search for functions or topics..." type="text"/>
+</div>
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:opacity-80 transition-transform active:scale-95" data-icon="camera_alt">camera_alt</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:opacity-80 transition-transform active:scale-95" data-icon="history">history</span>
+<span class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:opacity-80 transition-transform active:scale-95" data-icon="help">help</span>
+</div>
+</header>
+<!-- Side Navigation Anchor (Shared Component) -->
+<aside class="w-[320px] h-full hidden md:flex flex-col fixed left-0 top-0 bottom-0 z-40 bg-surface border-r border-outline-variant">
+<div class="p-lg">
+<h1 class="font-headline-sm text-headline-sm text-primary font-bold">MathFlow Pro</h1>
+<p class="font-body-md text-on-surface-variant text-sm">Academic Edition</p>
+</div>
+<nav class="flex-1 px-md space-y-unit">
+<div class="group flex items-center gap-md px-md py-sm rounded-lg transition-colors duration-200 text-on-surface-variant hover:bg-surface-container-high cursor-pointer">
+<span class="material-symbols-outlined" data-icon="calculate">calculate</span>
+<span class="font-body-md">Calculator</span>
+</div>
+<div class="group flex items-center gap-md px-md py-sm rounded-lg transition-colors duration-200 text-on-surface-variant hover:bg-surface-container-high cursor-pointer">
+<span class="material-symbols-outlined" data-icon="show_chart">show_chart</span>
+<span class="font-body-md">Graphing Tool</span>
+</div>
+<!-- Active State: Step-by-Step Solver -->
+<div class="group flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-l-4 border-primary bg-surface-container cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="auto_fix_high" style="font-variation-settings: 'FILL' 1;">auto_fix_high</span>
+<span class="font-body-md">Step-by-Step Solver</span>
+</div>
+<div class="group flex items-center gap-md px-md py-sm rounded-lg transition-colors duration-200 text-on-surface-variant hover:bg-surface-container-high cursor-pointer">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</div>
+</nav>
+<div class="p-md border-t border-outline-variant">
+<div class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="function">function</span>
+<span class="font-body-md">Constants</span>
+</div>
+<div class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer transition-colors duration-200">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md">Settings</span>
+</div>
+<div class="mt-lg flex items-center gap-md px-md">
+<img class="w-10 h-10 rounded-full border-2 border-primary-fixed object-cover" data-alt="A clean, professional headshot of a student in their early 20s, smiling gently. The background is a blurred academic library with warm bokeh lighting. The overall aesthetic is focused and intelligent, matching a high-end educational tool's branding." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBG3CXNV-VF5faPvhK7SoclA4nYJLAj47RiROBBBE1mKoyoY8WHfqTonghfuRko6i-ITMokp3QbdLOBII8fAcp97BhNiwmvAQTwql9EUS1c2UTFxJKqVgIS7bb4EZ-A-NC3W3qJ67F1DiVMtAGo9lszqx_ZVxlfoZDC5ZEqcrKY5A8I1y0iTF9RTabcs3tIqq5x3pF8_9vumV_U3OJCsAIhXmN0iU2IrhYg_LiNwPlPnFJLNkp-6VROWKM82xXyYd_OQg-EdbRxxiyn"/>
+<div>
+<p class="font-label-caps text-on-surface font-bold">ALEX R.</p>
+<p class="text-xs text-on-surface-variant">Mathematics Major</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-[320px] p-margin-mobile md:p-margin-desktop min-h-[calc(100vh-64px)] pb-32">
+<div class="max-w-3xl mx-auto space-y-lg">
+<!-- Problem Header -->
+<section class="bg-surface-container-low rounded-xl p-lg border border-outline-variant glow-subtle">
+<div class="flex items-center justify-between mb-md">
+<span class="font-label-caps text-primary bg-primary-fixed px-3 py-1 rounded-full">CURRENT PROBLEM</span>
+<div class="flex gap-sm">
+<button class="p-xs hover:bg-surface-container-high rounded transition-colors"><span class="material-symbols-outlined text-sm">share</span></button>
+<button class="p-xs hover:bg-surface-container-high rounded transition-colors"><span class="material-symbols-outlined text-sm">bookmark</span></button>
+</div>
+</div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md">
+<div class="equation-font text-headline-md text-primary select-all">
+                        f(x) = \int (3x^2 + 4x - 5) \, dx
+                    </div>
+<button class="flex items-center justify-center gap-sm bg-primary text-on-primary px-lg py-sm rounded-lg font-mono-technical hover:opacity-90 transition-all active:scale-95 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-md">refresh</span>
+                        Try a Similar Problem
+                    </button>
+</div>
+</section>
+<!-- Solution Path Segmented -->
+<div class="relative space-y-lg pl-md md:pl-0">
+<!-- Step 1 -->
+<div class="step-card relative flex gap-lg group">
+<div class="hidden md:flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold z-10 shrink-0">1</div>
+<div class="solution-path-line"></div>
+</div>
+<div class="bg-surface border border-outline-variant p-md rounded-xl w-full hover:border-primary/40 transition-colors">
+<div class="flex items-center gap-sm mb-sm md:hidden">
+<span class="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center text-xs font-bold">1</span>
+<span class="font-label-caps text-secondary uppercase">Identify Rules</span>
+</div>
+<div class="flex items-start justify-between">
+<div>
+<h3 class="font-headline-sm text-lg text-on-surface mb-xs">Apply Power Rule of Integration</h3>
+<p class="font-body-md text-on-surface-variant text-sm mb-md">For any term $ax^n$, the integral is $\frac{a}{n+1}x^{n+1}$.</p>
+</div>
+<div class="hidden lg:block">
+<span class="font-label-caps text-secondary bg-secondary-container px-2 py-0.5 rounded">CALCULUS</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-md rounded-lg border border-outline-variant/30 equation-font text-equation-display text-on-background">
+                            \int 3x^2 \, dx + \int 4x \, dx - \int 5 \, dx
+                        </div>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="step-card relative flex gap-lg group">
+<div class="hidden md:flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-surface-container-high border-2 border-primary flex items-center justify-center text-primary font-bold z-10 shrink-0">2</div>
+<div class="solution-path-line"></div>
+</div>
+<div class="bg-surface border border-outline-variant p-md rounded-xl w-full hover:border-primary/40 transition-colors">
+<div class="flex items-center gap-sm mb-sm md:hidden">
+<span class="w-6 h-6 rounded-full bg-surface-container-high border border-primary text-primary flex items-center justify-center text-xs font-bold">2</span>
+<span class="font-label-caps text-secondary uppercase">Processing</span>
+</div>
+<h3 class="font-headline-sm text-lg text-on-surface mb-xs">Evaluate individual integrals</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-md mt-md">
+<div class="p-sm bg-surface-container rounded border border-outline-variant/20">
+<span class="text-[10px] font-label-caps text-on-surface-variant block mb-1">TERM A</span>
+<span class="equation-font text-lg">\frac{3}{2+1}x^{2+1} = x^3</span>
+</div>
+<div class="p-sm bg-surface-container rounded border border-outline-variant/20">
+<span class="text-[10px] font-label-caps text-on-surface-variant block mb-1">TERM B</span>
+<span class="equation-font text-lg">\frac{4}{1+1}x^{1+1} = 2x^2</span>
+</div>
+<div class="p-sm bg-surface-container rounded border border-outline-variant/20">
+<span class="text-[10px] font-label-caps text-on-surface-variant block mb-1">TERM C</span>
+<span class="equation-font text-lg">5x</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="step-card relative flex gap-lg group">
+<div class="hidden md:flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-surface-container-high border-2 border-primary flex items-center justify-center text-primary font-bold z-10 shrink-0">3</div>
+<div class="solution-path-line"></div>
+</div>
+<div class="bg-surface border border-outline-variant p-md rounded-xl w-full hover:border-primary/40 transition-colors">
+<div class="flex items-center gap-sm mb-sm md:hidden">
+<span class="w-6 h-6 rounded-full bg-surface-container-high border border-primary text-primary flex items-center justify-center text-xs font-bold">3</span>
+<span class="font-label-caps text-secondary uppercase">Constant</span>
+</div>
+<h3 class="font-headline-sm text-lg text-on-surface mb-xs">Add Constant of Integration</h3>
+<p class="font-body-md text-on-surface-variant text-sm mb-md">Because this is an indefinite integral, we must add an arbitrary constant $C$.</p>
+<div class="bg-primary/5 p-md rounded-lg border-l-4 border-primary italic text-on-primary-container">
+                            "The derivative of a constant is zero, so any constant could have been part of the original function."
+                        </div>
+</div>
+</div>
+<!-- Final Result -->
+<div class="step-card relative flex gap-lg group">
+<div class="hidden md:flex flex-col items-center">
+<div class="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-on-secondary font-bold z-10 shrink-0">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<div class="bg-secondary/5 border-2 border-secondary p-lg rounded-xl w-full shadow-lg shadow-secondary/10">
+<div class="flex items-center gap-sm mb-sm md:hidden">
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+<span class="font-label-caps text-secondary uppercase">Solution</span>
+</div>
+<h3 class="font-headline-sm text-xl text-secondary mb-md">Final Result</h3>
+<div class="equation-font text-headline-md text-on-background bg-surface-container-lowest p-lg rounded-lg border border-secondary/20 flex justify-center items-center">
+                            F(x) = x^3 + 2x^2 - 5x + C
+                        </div>
+<div class="mt-lg flex flex-wrap gap-md">
+<button class="flex items-center gap-sm font-mono-technical text-sm text-secondary hover:underline">
+<span class="material-symbols-outlined text-md">show_chart</span> View on Graph
+                            </button>
+<button class="flex items-center gap-sm font-mono-technical text-sm text-secondary hover:underline">
+<span class="material-symbols-outlined text-md">terminal</span> Copy LaTeX
+                            </button>
+<button class="flex items-center gap-sm font-mono-technical text-sm text-secondary hover:underline">
+<span class="material-symbols-outlined text-md">description</span> Download PDF
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Asymmetric Bento-style Resources -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-md pt-xl">
+<div class="md:col-span-2 bg-surface-container-highest p-lg rounded-2xl flex flex-col justify-between border border-outline-variant">
+<div>
+<h4 class="font-headline-sm text-lg text-primary mb-sm">Video Walkthrough</h4>
+<p class="text-on-surface-variant font-body-md text-sm mb-lg">Watch Professor Elena explain the Power Rule and common integration pitfalls in this 5-minute deep dive.</p>
+</div>
+<div class="relative rounded-xl overflow-hidden aspect-video bg-black group cursor-pointer">
+<img class="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-500" data-alt="A professional tutorial thumbnail. A whiteboard in a bright studio with complex integrals written in blue marker. A friendly math educator is partially visible on the side, pointing towards the equations. The lighting is crisp and academic, using a high-end corporate video aesthetic with indigo and teal brand accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwfxa8wJQIIF2mfqSNodakssJC91tIj5Er0QFJ7tqSgApEM1M_EELFn_GH6z8A7BAlwtAMdS56K0T9wHmwj-Lu-NopUyaJaUuP9YY0A1Vj5n60AHRWdk8vkiOnMou1DD3rs9vnhKH61x5c8hCOKEnD81PQNwhjkAwRgMuhbMgwhk59ArMN4JePcKF-xpltaO__nfrD-exv5waQm85nfv3uLLziMy75VsfC8JnCUDEHJsmlGPtKKk4qAkst8SR7YGlKZGPi5CehHQE_"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-16 h-16 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</div>
+</div>
+<div class="absolute bottom-4 left-4 bg-black/50 backdrop-blur px-3 py-1 rounded text-white text-xs font-mono-technical">05:42</div>
+</div>
+</div>
+<div class="bg-primary p-lg rounded-2xl flex flex-col text-on-primary">
+<span class="material-symbols-outlined text-4xl mb-md" style="font-variation-settings: 'FILL' 0;">school</span>
+<h4 class="font-headline-sm text-lg mb-sm">Concept Mastery</h4>
+<p class="text-on-primary/70 text-sm mb-lg flex-1">Practice 15 more indefinite integrals to earn the 'Integral Architect' badge.</p>
+<div class="w-full bg-white/20 h-2 rounded-full overflow-hidden mb-2">
+<div class="bg-secondary-fixed w-2/3 h-full rounded-full"></div>
+</div>
+<div class="flex justify-between text-xs font-mono-technical">
+<span>10/15 Completed</span>
+<span>67%</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Bottom Navigation Anchor (Shared Component - Mobile Only) -->
+<footer class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-2 pt-2 md:hidden bg-surface/80 backdrop-blur-lg border-t border-outline-variant shadow-md">
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1">
+<span class="material-symbols-outlined" data-icon="calculate">calculate</span>
+<span class="font-label-caps text-label-caps">Calc</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1">
+<span class="material-symbols-outlined" data-icon="show_chart">show_chart</span>
+<span class="font-label-caps text-label-caps">Graph</span>
+</div>
+<!-- Active State for Steps -->
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-3 py-1">
+<span class="material-symbols-outlined" data-icon="auto_fix_high" style="font-variation-settings: 'FILL' 1;">auto_fix_high</span>
+<span class="font-label-caps text-label-caps">Steps</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps">Dash</span>
+</div>
+</footer>
+<script>
+        // Micro-interactions
+        document.querySelectorAll('.step-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.querySelector('.bg-surface')?.classList.add('shadow-sm');
+                card.querySelector('.bg-surface')?.classList.add('border-primary/20');
+            });
+            card.addEventListener('mouseleave', () => {
+                card.querySelector('.bg-surface')?.classList.remove('shadow-sm');
+                card.querySelector('.bg-surface')?.classList.remove('border-primary/20');
+            });
+        });
+
+        // Simulating "Try Similar Problem" ripple
+        const solveBtn = document.querySelector('button.bg-primary');
+        if (solveBtn) {
+            solveBtn.addEventListener('mousedown', () => {
+                solveBtn.classList.add('scale-95');
+            });
+            solveBtn.addEventListener('mouseup', () => {
+                solveBtn.classList.remove('scale-95');
+            });
+        }
+    </script>
+</body></html>
