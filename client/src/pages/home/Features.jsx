@@ -69,7 +69,7 @@ export default function Features() {
   const ref = useGsapReveal('[data-reveal]');
 
   return (
-    <Section ref={ref}>
+    <Section id="features" ref={ref}>
       <ContentContainer>
         <Heading data-reveal>Everything you need to learn LP</Heading>
         <ResponsiveGrid $cols={3}>
