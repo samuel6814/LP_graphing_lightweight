@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import GlobalStyle from './styles/GlobalStyle';
+import 'katex/dist/katex.min.css';
 import './styles/katex-overrides.css';
 import { ThemeModeProvider, useThemeMode } from './context/ThemeModeContext';
 import { ToolsProvider } from './context/ToolsContext';

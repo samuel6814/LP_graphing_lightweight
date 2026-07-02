@@ -1,7 +1,7 @@
-import 'katex/dist/katex.min.css';
-import { InlineMath } from 'react-katex';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 import { parseMathText } from '../../utils/parseMathText';
+import { tryRenderKatex } from '../../utils/katexRender';
 
 const Text = styled.span`
   line-height: inherit;
@@ -16,14 +16,18 @@ const MathError = styled.span`
   border-radius: 3px;
 `;
 
-const KATEX_OPTS = {
-  throwOnError: false,
-  strict: 'warn',
-  trust: false,
-};
+const InlineMathHtml = styled.span`
+  display: inline;
+`;
 
-function renderMathError() {
-  return <MathError>!</MathError>;
+function InlineKatex({ latex }) {
+  const { html, error } = useMemo(
+    () => tryRenderKatex(latex, { displayMode: false }),
+    [latex],
+  );
+
+  if (error) return <MathError>!</MathError>;
+  return <InlineMathHtml dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 const TAG_MAP = {
@@ -42,14 +46,7 @@ export default function MathText({ children, as = 'span', className = '' }) {
 
   const content = segments.map((seg, i) => {
     if (seg.type === 'math') {
-      return (
-        <InlineMath
-          key={i}
-          math={seg.value}
-          {...KATEX_OPTS}
-          renderError={renderMathError}
-        />
-      );
+      return <InlineKatex key={i} latex={seg.value} />;
     }
     return <Text key={i}>{seg.value}</Text>;
   });

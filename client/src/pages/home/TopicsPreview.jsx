@@ -5,6 +5,7 @@ import { topics } from '../../data/topicRegistry';
 import { getTopicPath } from '../../utils/routes';
 import { useGsapReveal } from '../../hooks/useGsapReveal';
 import { PageSection, ContentContainer, CardGrid } from '../../styles/layout';
+import MathText from '../../components/presentation/MathText';
 
 const Section = styled(PageSection)``;
 
@@ -73,7 +74,9 @@ export default function TopicsPreview() {
             <Card key={t.slug} to={getTopicPath(t.slug)}>
               <Module>Module {t.module}</Module>
               <Title>{t.title}</Title>
-              <Summary>{t.summary}</Summary>
+              <Summary>
+                <MathText as="span">{t.summary}</MathText>
+              </Summary>
             </Card>
           ))}
         </CardGrid>

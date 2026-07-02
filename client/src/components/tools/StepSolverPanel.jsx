@@ -106,11 +106,7 @@ export default function StepSolverPanel() {
                 <CheckCircle size={14} />
               </Dot>
               <StepTitle>
-                {step.title?.includes('$') ? (
-                  <MathText as="span">{step.title}</MathText>
-                ) : (
-                  step.title
-                )}
+                <MathText as="span">{step.title}</MathText>
               </StepTitle>
               <StepDetail>
                 <MathText as="span">{step.detail}</MathText>

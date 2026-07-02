@@ -289,7 +289,11 @@ function TableOfContents({ sections }) {
         {sections.map((s, i) => (
           <li key={i}>
             <TocLink href={`#section-${i}`}>
-              {s.heading || `Section ${i + 1}`}
+              {s.heading ? (
+                <MathText as="span">{s.heading}</MathText>
+              ) : (
+                `Section ${i + 1}`
+              )}
             </TocLink>
           </li>
         ))}
@@ -362,11 +366,15 @@ export default function TopicPage() {
               </CompletedBadge>
             )}
           </TitleRow>
-          <Summary>{topic.summary}</Summary>
+          <Summary>
+            <MathText as="span">{topic.summary}</MathText>
+          </Summary>
           {topic.quickAnswer && (
             <QuickAnswer aria-labelledby="quick-answer-heading">
               <QuickAnswerHeading id="quick-answer-heading">Quick answer</QuickAnswerHeading>
-              <QuickAnswerText>{topic.quickAnswer}</QuickAnswerText>
+              <QuickAnswerText>
+                <MathText as="span">{topic.quickAnswer}</MathText>
+              </QuickAnswerText>
             </QuickAnswer>
           )}
           <ActionRow>

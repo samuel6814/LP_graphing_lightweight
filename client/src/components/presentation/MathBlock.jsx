@@ -1,7 +1,7 @@
-import 'katex/dist/katex.min.css';
-import { BlockMath, InlineMath } from 'react-katex';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 import media from '../../styles/media';
+import { tryRenderKatex } from '../../utils/katexRender';
 
 const Wrapper = styled.div`
   color: ${({ theme }) => theme.colors.onSurface};
@@ -33,24 +33,28 @@ const MathError = styled.span`
   border-radius: 4px;
 `;
 
-const KATEX_OPTS = {
-  throwOnError: false,
-  strict: 'warn',
-  trust: false,
-};
+const MathHtml = styled.div`
+  display: ${({ $inline }) => ($inline ? 'inline' : 'block')};
+`;
 
-function renderMathError(err) {
-  return <MathError title={err?.message}>Math render error</MathError>;
+function KatexHtml({ html, inline }) {
+  return <MathHtml $inline={inline} dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
 export default function MathBlock({ children, display = true, className = '' }) {
+  const { html, error } = useMemo(
+    () => tryRenderKatex(children, { displayMode: display }),
+    [children, display],
+  );
+
   if (!children) return null;
+
   return (
     <Wrapper className={`math-block ${display ? 'block' : ''} ${className}`}>
-      {display ? (
-        <BlockMath math={children} {...KATEX_OPTS} renderError={renderMathError} />
+      {error ? (
+        <MathError title={error.message}>Math render error</MathError>
       ) : (
-        <InlineMath math={children} {...KATEX_OPTS} renderError={renderMathError} />
+        <KatexHtml html={html} inline={!display} />
       )}
     </Wrapper>
   );

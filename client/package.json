@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "prebuild": "node scripts/generate-seo-assets.js",
+    "prebuild": "node scripts/validate-math.js && node scripts/generate-seo-assets.js",
     "build": "vite build",
     "validate-math": "node scripts/validate-math.js",
     "test:feasible": "node scripts/test-feasible-region.js",
@@ -19,7 +19,6 @@
     "mathjs": "^15.2.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-katex": "^3.1.0",
     "react-router-dom": "^7.18.1",
     "styled-components": "^6.4.3"
   },

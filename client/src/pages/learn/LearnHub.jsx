@@ -10,6 +10,7 @@ import { JsonLdMulti } from '../../components/seo/JsonLd';
 import { learnHubSchemas } from '../../utils/seoSchema';
 import { CardGrid } from '../../styles/layout';
 import media from '../../styles/media';
+import MathText from '../../components/presentation/MathText';
 
 const Header = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing.xl};
@@ -216,7 +217,9 @@ export default function LearnHub() {
                     <CardTitle>{t.title}</CardTitle>
                     {isComplete(t.slug) && <CheckCircle size={18} color={colors.secondary} />}
                   </CardTop>
-                  <CardSummary>{t.summary}</CardSummary>
+                  <CardSummary>
+                    <MathText as="span">{t.summary}</MathText>
+                  </CardSummary>
                   <CardFooter>
                     <span>Module {t.module}</span>
                     <ArrowRight size={16} />

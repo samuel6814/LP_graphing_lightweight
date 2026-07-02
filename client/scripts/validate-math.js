@@ -1,13 +1,16 @@
 #!/usr/bin/env node
 /**
- * Validate all KaTeX strings in topic content.
+ * Validate all KaTeX strings in topic content and registry metadata.
  * Run: npm run validate-math
  */
 import katex from 'katex';
 import { topicContent } from '../src/data/topics/index.js';
+import { topics } from '../src/data/topicRegistry.js';
 import { extractInlineMath } from '../src/utils/parseMathText.js';
 
 const failures = [];
+let displayCount = 0;
+let inlineCount = 0;
 
 function validate(latex, label, displayMode = false) {
   try {
@@ -23,6 +26,7 @@ function walkStrings(obj, path) {
   if (typeof obj === 'string') {
     extractInlineMath(obj).forEach((seg, i) => {
       validate(seg, `${path} [inline $${i + 1}$]`);
+      inlineCount++;
     });
     return;
   }
@@ -35,6 +39,7 @@ function walkStrings(obj, path) {
       const next = `${path}.${key}`;
       if (key === 'math' && typeof val === 'string') {
         validate(val, next, true);
+        displayCount++;
       } else {
         walkStrings(val, next);
       }
@@ -42,28 +47,16 @@ function walkStrings(obj, path) {
   }
 }
 
-let displayCount = 0;
-let inlineCount = 0;
-
 for (const [slug, content] of Object.entries(topicContent)) {
   walkStrings(content, slug);
 }
 
-// Count successes from walk
-function countMath(obj) {
-  if (typeof obj === 'string') {
-    inlineCount += extractInlineMath(obj).length;
-    return;
-  }
-  if (Array.isArray(obj)) obj.forEach(countMath);
-  else if (obj && typeof obj === 'object') {
-    for (const [key, val] of Object.entries(obj)) {
-      if (key === 'math' && typeof val === 'string') displayCount++;
-      else countMath(val);
-    }
+for (const topic of topics) {
+  walkStrings(topic.summary, `registry.${topic.slug}.summary`);
+  if (topic.quickAnswer) {
+    walkStrings(topic.quickAnswer, `registry.${topic.slug}.quickAnswer`);
   }
 }
-countMath(topicContent);
 
 if (failures.length > 0) {
   console.error(`\n${failures.length} KaTeX validation error(s):\n`);
@@ -75,4 +68,6 @@ if (failures.length > 0) {
   process.exit(1);
 }
 
-console.log(`KaTeX validation passed: ${displayCount} display + ${inlineCount} inline expressions across ${Object.keys(topicContent).length} topics.`);
+console.log(
+  `KaTeX validation passed: ${displayCount} display + ${inlineCount} inline expressions across ${Object.keys(topicContent).length} topics and ${topics.length} registry entries.`,
+);

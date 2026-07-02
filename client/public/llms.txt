@@ -8,16 +8,16 @@
 
 - [Introduction to Linear Programming](https://lp-graph-six.vercel.app/learn/intro-to-linear-programming): What LP is, what “programming” means, and when models are linear.
 - [LP Definitions: Feasible & Optimal](https://lp-graph-six.vercel.app/learn/lp-definitions): Objective, constraints, feasible solutions, optimal solutions, and the feasible region.
-- [General LP Formulation](https://lp-graph-six.vercel.app/learn/general-lp-formulation): Standard mathematical form with n decision variables and m constraints.
-- [Key Terminology](https://lp-graph-six.vercel.app/learn/key-terminology): Coefficients cj, technological coefficients aij, and resource availabilities bi.
-- [Graphing Linear Inequalities](https://lp-graph-six.vercel.app/learn/graphing-linear-inequalities): Boundary lines, test points, and half-plane shading for ax + by ≤ c.
+- [General LP Formulation](https://lp-graph-six.vercel.app/learn/general-lp-formulation): Standard mathematical form with $n$ decision variables and $m$ constraints.
+- [Key Terminology](https://lp-graph-six.vercel.app/learn/key-terminology): Coefficients $c_j$, technological coefficients $a_{ij}$, and resource availabilities $b_i$.
+- [Graphing Linear Inequalities](https://lp-graph-six.vercel.app/learn/graphing-linear-inequalities): Boundary lines, test points, and half-plane shading for $ax + by \leq c$.
 - [Systems of Linear Inequalities](https://lp-graph-six.vercel.app/learn/systems-of-inequalities): Intersecting half-planes to find the feasible region of a system.
 - [Problem Formulation](https://lp-graph-six.vercel.app/learn/problem-formulation): Four-step modeling: decision variables, data, constraints, objective.
 - [Extreme Points & Optimal Solution](https://lp-graph-six.vercel.app/learn/extreme-points): Theorem: for bounded feasible regions, an optimum occurs at an extreme point.
 - [Isoprofit / Isocost Line Method](https://lp-graph-six.vercel.app/learn/isoprofit-method): Slide parallel objective lines to find the optimal corner point.
 - [Graphical Solution Procedure](https://lp-graph-six.vercel.app/learn/graphical-solution): End-to-end graphical solution for two-variable LP problems.
 - [Standard Form & Slack Variables](https://lp-graph-six.vercel.app/learn/standard-form): Convert inequalities to equalities using slack, surplus, and artificial variables.
-- [Simplex Algorithm](https://lp-graph-six.vercel.app/learn/simplex-algorithm): Pivot from basic feasible solution to optimum via cj − zj optimality test.
+- [Simplex Algorithm](https://lp-graph-six.vercel.app/learn/simplex-algorithm): Pivot from basic feasible solution to optimum via $c_j - z_j$ optimality test.
 - [Special Cases: Unbounded & Infeasible](https://lp-graph-six.vercel.app/learn/special-cases): Detecting empty feasible regions and objectives that grow without bound.
 - [Degeneracy](https://lp-graph-six.vercel.app/learn/degeneracy): Ties in leaving variable selection and zero basic variables at corners.
 - [Artificial Variables](https://lp-graph-six.vercel.app/learn/artificial-variables): Introducing artificial variables to obtain an initial basic feasible solution.

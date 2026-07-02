@@ -43,9 +43,9 @@ export const topics = [
     slug: 'general-lp-formulation',
     title: 'General LP Formulation',
     module: 1,
-    summary: 'Standard mathematical form with n decision variables and m constraints.',
+    summary: 'Standard mathematical form with $n$ decision variables and $m$ constraints.',
     quickAnswer:
-      'A general LP model chooses values for decision variables xj to optimize a linear objective Z = sum of cj times xj, subject to m linear constraints on resources and non-negativity. Coefficients cj are profits or costs; aij and bi describe resource use and availability.',
+      'A general LP model chooses values for decision variables $x_j$ to optimize a linear objective $Z = \\sum_j c_j x_j$, subject to $m$ linear constraints on resources and non-negativity. Coefficients $c_j$ are profits or costs; $a_{ij}$ and $b_i$ describe resource use and availability.',
     keywords: ['LP formulation', 'decision variables', 'constraints', 'objective function'],
     defaultGraph: { type: 'functions', expressions: ['3*x1 + 2*x2'] },
   },
@@ -54,9 +54,9 @@ export const topics = [
     slug: 'key-terminology',
     title: 'Key Terminology',
     module: 1,
-    summary: 'Coefficients cj, technological coefficients aij, and resource availabilities bi.',
+    summary: 'Coefficients $c_j$, technological coefficients $a_{ij}$, and resource availabilities $b_i$.',
     quickAnswer:
-      'In LP notation, cj is the profit or cost per unit of activity j, aij is how much resource i is consumed per unit of activity j, and bi is the total amount available of resource i. Constraints take the form sum of aij times xj compared to bi.',
+      'In LP notation, $c_j$ is the profit or cost per unit of activity $j$, $a_{ij}$ is how much resource $i$ is consumed per unit of activity $j$, and $b_i$ is the total amount available of resource $i$. Constraints take the form $\\sum_j a_{ij} x_j$ compared to $b_i$.',
     keywords: ['LP terminology', 'technological coefficients', 'RHS', 'objective coefficients'],
     defaultGraph: { type: 'lp', constraints: ['x>=0', 'y>=0', '2*x+3*y<=12'], objective: 'max 5*x+4*y' },
   },
@@ -65,7 +65,7 @@ export const topics = [
     slug: 'graphing-linear-inequalities',
     title: 'Graphing Linear Inequalities',
     module: 2,
-    summary: 'Boundary lines, test points, and half-plane shading for ax + by ≤ c.',
+    summary: 'Boundary lines, test points, and half-plane shading for $ax + by \\leq c$.',
     quickAnswer:
       'To graph a linear inequality, first draw the boundary line from the corresponding equality. Then use a test point (often the origin) to decide which half-plane satisfies the inequality and shade that region. Dashed lines indicate strict inequalities.',
     keywords: ['graphing inequalities', 'half-plane', 'test point', 'feasible region'],
@@ -157,7 +157,7 @@ export const topics = [
     module: 3,
     summary: 'Convert inequalities to equalities using slack, surplus, and artificial variables.',
     quickAnswer:
-      'Standard form LP uses equality constraints and non-negative variables. Slack variables convert less-than-or-equal constraints to equalities by adding leftover capacity. Surplus and artificial variables handle greater-than and equality constraints for simplex tableaus.',
+      'Standard form LP uses equality constraints and non-negative variables. Slack variables convert $\\leq$ constraints to equalities by adding leftover capacity. Surplus and artificial variables handle $\\geq$ and equality constraints for simplex tableaus.',
     keywords: ['standard form', 'slack variables', 'surplus variables', 'simplex'],
     defaultGraph: { type: 'functions', expressions: ['x1 + x2 + s1 - 4'] },
   },
@@ -166,9 +166,9 @@ export const topics = [
     slug: 'simplex-algorithm',
     title: 'Simplex Algorithm',
     module: 3,
-    summary: 'Pivot from basic feasible solution to optimum via cj − zj optimality test.',
+    summary: 'Pivot from basic feasible solution to optimum via $c_j - z_j$ optimality test.',
     quickAnswer:
-      'The simplex algorithm moves from one basic feasible solution to another by pivoting, improving the objective each step until the optimality test (non-positive reduced costs for maximization) shows no further improvement. It is the standard computational method for LP.',
+      'The simplex algorithm moves from one basic feasible solution to another by pivoting, improving the objective each step until the optimality test (non-positive reduced costs $c_j - z_j$ for maximization) shows no further improvement. It is the standard computational method for LP.',
     keywords: ['simplex algorithm', 'pivot', 'basic feasible solution', 'optimality test'],
     defaultGraph: {
       type: 'lp',
@@ -198,7 +198,7 @@ export const topics = [
     module: 3,
     summary: 'Ties in leaving variable selection and zero basic variables at corners.',
     quickAnswer:
-      'Degeneracy in the simplex method occurs when a basic variable takes value zero at a corner, often from more than n constraints meeting at one point. It can cause cycling but is handled with careful pivot rules and remains a theoretical concern in practice.',
+      'Degeneracy in the simplex method occurs when a basic variable takes value zero at a corner, often from more than $n$ constraints meeting at one point. It can cause cycling but is handled with careful pivot rules and remains a theoretical concern in practice.',
     keywords: ['degeneracy', 'simplex method', 'basic variables', 'cycling'],
     defaultGraph: {
       type: 'lp',
@@ -213,7 +213,7 @@ export const topics = [
     module: 3,
     summary: 'Introducing artificial variables to obtain an initial basic feasible solution.',
     quickAnswer:
-      'Artificial variables are added to constraints that lack an obvious starting basic feasible solution, especially equalities or greater-than constraints. They are penalized heavily in the objective so the simplex method drives them to zero when a feasible solution exists.',
+      'Artificial variables are added to constraints that lack an obvious starting basic feasible solution, especially equalities or $\\geq$ constraints. They are penalized heavily in the objective so the simplex method drives them to zero when a feasible solution exists.',
     keywords: ['artificial variables', 'initial BFS', 'simplex', 'big M method'],
     defaultGraph: { type: 'functions', expressions: ['x1 + x2 + a1 - 5'] },
   },
@@ -291,7 +291,7 @@ export const topics = [
     module: 5,
     summary: 'One-to-one assignment with Hungarian / opportunity cost method.',
     quickAnswer:
-      'The assignment problem allocates n tasks to n agents one-to-one at minimum total cost. It is a special LP with binary decision variables, solved efficiently by the Hungarian or opportunity cost method rather than general simplex.',
+      'The assignment problem allocates $n$ tasks to $n$ agents one-to-one at minimum total cost. It is a special LP with binary decision variables, solved efficiently by the Hungarian or opportunity cost method rather than general simplex.',
     keywords: ['assignment problem', 'Hungarian method', 'one-to-one assignment', 'LP applications'],
     defaultGraph: { type: 'functions', expressions: ['7', '9', '8'] },
   },
