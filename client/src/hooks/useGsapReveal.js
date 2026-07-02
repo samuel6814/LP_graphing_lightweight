@@ -73,7 +73,10 @@ export function useHeroAnimation(ref) {
     const copyTargets = ref.current.querySelectorAll('[data-hero-copy]');
 
     const ctx = gsap.context(() => {
-      if (!visual) return;
+      if (!visual) {
+        if (copyTargets.length) gsap.set(copyTargets, { opacity: 1, y: 0 });
+        return;
+      }
 
       const lines = visual.querySelectorAll('[data-hero-line]');
       const axes = visual.querySelectorAll('[data-hero-axis]');
@@ -88,14 +91,14 @@ export function useHeroAnimation(ref) {
       gsap.set(axes, { opacity: 0 });
       if (region) gsap.set(region, { opacity: 0, scale: 0.92, transformOrigin: 'center center' });
       if (dots.length) gsap.set(dots, { opacity: 0, scale: 0, transformOrigin: 'center center' });
-      gsap.set(copyTargets, { opacity: 0, y: 20 });
+      if (copyTargets.length) gsap.set(copyTargets, { opacity: 0, y: 20 });
 
       if (reduce) {
         gsap.set(lines, { strokeDashoffset: 0 });
         gsap.set(axes, { opacity: 0.4 });
         if (region) gsap.set(region, { opacity: 1, scale: 1 });
         if (dots.length) gsap.set(dots, { opacity: 1, scale: 1 });
-        gsap.set(copyTargets, { opacity: 1, y: 0 });
+        if (copyTargets.length) gsap.set(copyTargets, { opacity: 1, y: 0 });
         return;
       }
 
@@ -118,13 +121,15 @@ export function useHeroAnimation(ref) {
         tl.to(region, { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out' }, '-=0.3');
       }
 
-      tl.from(copyTargets, {
-        opacity: 0,
-        y: 20,
-        duration: 0.7,
-        stagger: 0.12,
-        ease: 'power3.out',
-      });
+      if (copyTargets.length) {
+        tl.to(copyTargets, {
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          stagger: 0.12,
+          ease: 'power3.out',
+        });
+      }
 
       tl.add(() => startFloatLoop(lines, region, dots));
     }, ref);
