@@ -48,28 +48,50 @@ const Dock = styled.div`
   width: min(480px, 100vw);
   background: ${({ theme }) => theme.colors.surface};
   border-left: 1px solid ${({ theme }) => theme.colors.outlineVariant};
-  z-index: 102;
+  z-index: ${({ $fullscreen }) => ($fullscreen ? 200 : 102)};
   display: flex;
   flex-direction: column;
   transform: translateX(${({ $open }) => ($open ? '0' : '100%')});
   transition: transform 0.3s ease;
   box-shadow: ${({ theme }) => theme.shadows.popover};
 
+  ${({ $fullscreen }) =>
+    $fullscreen &&
+    `
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    border-left: none;
+    border-radius: 0;
+    transform: none;
+  `}
+
   ${media.tablet} {
-    width: min(400px, 90vw);
+    width: ${({ $fullscreen }) => ($fullscreen ? '100vw' : 'min(400px, 90vw)')};
   }
 
   ${media.mobile} {
     top: auto;
     left: 0;
     right: 0;
-    height: min(75vh, 600px);
+    height: ${({ $fullscreen }) => ($fullscreen ? '100vh' : 'min(75vh, 600px)')};
     width: 100vw;
     border-left: none;
     border-top: 1px solid ${({ theme }) => theme.colors.outlineVariant};
-    border-radius: ${({ theme }) => theme.radii.xl} ${({ theme }) => theme.radii.xl} 0 0;
-    transform: translateY(${({ $open }) => ($open ? '0' : '100%')});
+    border-radius: ${({ $fullscreen, theme }) =>
+      $fullscreen ? '0' : `${theme.radii.xl} ${theme.radii.xl} 0 0`};
+    transform: translateY(${({ $open, $fullscreen }) => ($fullscreen || $open ? '0' : '100%')});
     padding-bottom: env(safe-area-inset-bottom, 0);
+
+    ${({ $fullscreen }) =>
+      $fullscreen &&
+      `
+      top: 0;
+      border-top: none;
+    `}
   }
 `;
 
@@ -131,7 +153,8 @@ const TABS = [
 ];
 
 export default function ToolsDock() {
-  const { isOpen, setIsOpen, activeTab, setActiveTab } = useTools();
+  const { isOpen, setIsOpen, activeTab, setActiveTab, graphFullscreen } = useTools();
+  const isGraphFullscreen = isOpen && activeTab === 'graph' && graphFullscreen;
 
   return (
     <>
@@ -139,7 +162,7 @@ export default function ToolsDock() {
         <LineChart size={24} />
       </Fab>
       <Overlay $open={isOpen} onClick={() => setIsOpen(false)} />
-      <Dock $open={isOpen}>
+      <Dock $open={isOpen} $fullscreen={isGraphFullscreen}>
         <DockHeader>
           <Tabs>
             {TABS.map(({ id, label, icon: Icon }) => (

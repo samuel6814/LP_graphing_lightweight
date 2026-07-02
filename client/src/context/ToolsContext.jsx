@@ -8,13 +8,24 @@ const DEFAULT_EXPRESSIONS = [
 ];
 
 export function ToolsProvider({ children }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('graph');
+  const [isOpen, setIsOpenState] = useState(false);
+  const [activeTab, setActiveTabState] = useState('graph');
+  const [graphFullscreen, setGraphFullscreen] = useState(false);
   const [expressions, setExpressions] = useState(DEFAULT_EXPRESSIONS);
   const [lpConfig, setLpConfig] = useState(null);
   const [calcDisplay, setCalcDisplay] = useState('0');
   const [calcExpr, setCalcExpr] = useState('');
   const [solverSteps, setSolverSteps] = useState([]);
+
+  const setIsOpen = useCallback((open) => {
+    setIsOpenState(open);
+    if (!open) setGraphFullscreen(false);
+  }, []);
+
+  const setActiveTab = useCallback((tab) => {
+    setActiveTabState(tab);
+    if (tab !== 'graph') setGraphFullscreen(false);
+  }, []);
 
   const loadTopicGraph = useCallback((defaultGraph) => {
     if (!defaultGraph) return;
@@ -49,6 +60,8 @@ export function ToolsProvider({ children }) {
       setIsOpen,
       activeTab,
       setActiveTab,
+      graphFullscreen,
+      setGraphFullscreen,
       expressions,
       setExpressions,
       lpConfig,
@@ -64,7 +77,10 @@ export function ToolsProvider({ children }) {
     }),
     [
       isOpen,
+      setIsOpen,
       activeTab,
+      setActiveTab,
+      graphFullscreen,
       expressions,
       lpConfig,
       calcDisplay,

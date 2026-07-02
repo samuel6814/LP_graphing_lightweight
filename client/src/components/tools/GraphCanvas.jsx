@@ -118,18 +118,22 @@ export default function GraphCanvas({ expressions = [], lpConfig = null }) {
     }
 
     expressions
-      .filter((e) => e.visible)
+      .filter((e) => e.visible && e.expr?.trim())
       .forEach((e) => {
-        const { segments } = samplePlot(e.expr, xRange, yRange, e.mode || 'auto');
-        const color = PLOT_COLORS[e.color] || PLOT_COLORS.teal;
-        segments.forEach((seg) => {
-          if (seg.points.length > 1) {
-            result.push({
-              d: pointsToPath(seg.points, w, h, xRange, yRange),
-              color,
-            });
-          }
-        });
+        try {
+          const { segments } = samplePlot(e.expr, xRange, yRange, e.mode || 'auto');
+          const color = PLOT_COLORS[e.color] || PLOT_COLORS.teal;
+          segments.forEach((seg) => {
+            if (seg.points.length > 1) {
+              result.push({
+                d: pointsToPath(seg.points, w, h, xRange, yRange),
+                color,
+              });
+            }
+          });
+        } catch {
+          /* skip invalid expression */
+        }
       });
 
     return result;

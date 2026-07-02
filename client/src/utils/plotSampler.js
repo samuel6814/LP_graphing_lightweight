@@ -37,6 +37,10 @@ function prepareExpr(expr) {
   return normalizePlotVars(expr.trim());
 }
 
+export function isPlottable(expr) {
+  return Boolean(expr && String(expr).trim());
+}
+
 function evalSafe(fn, x, y) {
   try {
     const v = fn(x, y);
@@ -47,20 +51,39 @@ function evalSafe(fn, x, y) {
 }
 
 export function buildEvaluator(expr, type) {
+  if (!isPlottable(expr)) return null;
   const normalized = prepareExpr(expr);
 
   if (type === 'implicit') {
     const eqMatch = normalized.match(/^(.+?)(?<![=<>!])=(?!=)(.+)$/);
     if (!eqMatch) return null;
-    const lhs = math.compile(eqMatch[1].trim());
-    const rhs = math.compile(eqMatch[2].trim());
+    const lhsSrc = eqMatch[1].trim();
+    const rhsSrc = eqMatch[2].trim();
+    if (!lhsSrc || !rhsSrc) return null;
+    let lhs;
+    let rhs;
+    try {
+      lhs = math.compile(lhsSrc);
+    } catch {
+      return null;
+    }
+    try {
+      rhs = math.compile(rhsSrc);
+    } catch {
+      return null;
+    }
     return (x, y) => {
       const scope = { x, y, z: 0 };
       return lhs.evaluate(scope) - rhs.evaluate(scope);
     };
   }
 
-  const compiled = math.compile(normalized);
+  let compiled;
+  try {
+    compiled = math.compile(normalized);
+  } catch {
+    return null;
+  }
   return (x) => {
     const scope = { x, y: 0, z: 0 };
     return compiled.evaluate(scope);
@@ -68,6 +91,7 @@ export function buildEvaluator(expr, type) {
 }
 
 export function sampleExplicit(expr, xRange, steps = 200, mode = 'auto') {
+  if (!isPlottable(expr)) return { segments: [] };
   const type = resolvePlotType(expr, mode);
   if (type !== 'explicit') return { segments: [] };
 
@@ -122,6 +146,7 @@ const MS_SEGMENTS = [
 ];
 
 export function sampleImplicit(expr, xRange, yRange, gridSteps = 80, mode = 'auto') {
+  if (!isPlottable(expr)) return { segments: [] };
   const type = resolvePlotType(expr, mode);
   if (type !== 'implicit') return { segments: [] };
 
@@ -185,6 +210,7 @@ export function sampleImplicit(expr, xRange, yRange, gridSteps = 80, mode = 'aut
 }
 
 export function samplePlot(expr, xRange, yRange, mode = 'auto') {
+  if (!isPlottable(expr)) return { segments: [] };
   const type = resolvePlotType(expr, mode);
   if (type === 'implicit') {
     return sampleImplicit(expr, xRange, yRange, 80, mode);

@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Plus, Eye, EyeOff, X } from 'lucide-react';
+import { Plus, Eye, EyeOff, X, Maximize2, Minimize2 } from 'lucide-react';
 import { useTools } from '../../context/ToolsContext';
 import { getPlotColor, plotLabel, resolvePlotType } from '../../utils/plotSampler';
 import GraphCanvas from './GraphCanvas';
@@ -128,6 +128,26 @@ const GraphArea = styled.div`
   }
 `;
 
+const HeaderActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.sm};
+`;
+
+const IconBtn = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  color: ${({ theme }) => theme.colors.primary};
+  border-radius: ${({ theme }) => theme.radii.md};
+
+  &:hover {
+    background: ${({ theme }) => theme.colors.surfaceContainer};
+  }
+`;
+
 const AddBtn = styled.button`
   display: flex;
   align-items: center;
@@ -138,6 +158,14 @@ const AddBtn = styled.button`
   letter-spacing: 0.05em;
   padding: ${({ theme }) => theme.spacing.sm};
   min-height: 44px;
+`;
+
+const ListCompact = styled(List)`
+  max-height: ${({ $compact }) => ($compact ? '120px' : '220px')};
+
+  ${media.mobile} {
+    max-height: ${({ $compact }) => ($compact ? '80px' : '140px')};
+  }
 `;
 
 const LpTitle = styled.div`
@@ -165,7 +193,7 @@ function placeholderForMode(mode, expr) {
 }
 
 export default function GraphingPanel() {
-  const { expressions, setExpressions, lpConfig } = useTools();
+  const { expressions, setExpressions, lpConfig, graphFullscreen, setGraphFullscreen } = useTools();
 
   const updateExpr = (id, patch) => {
     setExpressions((prev) =>
@@ -208,12 +236,21 @@ export default function GraphingPanel() {
     <Panel>
       <Header>
         <Title>Graphing Tool</Title>
-        <AddBtn type="button" onClick={addExpr}>
-          <Plus size={18} /> Add
-        </AddBtn>
+        <HeaderActions>
+          <IconBtn
+            type="button"
+            onClick={() => setGraphFullscreen((v) => !v)}
+            aria-label={graphFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+          >
+            {graphFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
+          </IconBtn>
+          <AddBtn type="button" onClick={addExpr}>
+            <Plus size={18} /> Add
+          </AddBtn>
+        </HeaderActions>
       </Header>
       {(lpConfig || expressions.length > 0) && (
-        <List>
+        <ListCompact $compact={graphFullscreen}>
           {lpConfig && (
             <Card>
               <Strip $color={COLORS.teal} />
@@ -262,7 +299,7 @@ export default function GraphingPanel() {
               </CardBody>
             </Card>
           ))}
-        </List>
+        </ListCompact>
       )}
       <GraphArea>
         <GraphCanvas expressions={expressions} lpConfig={lpConfig} />
