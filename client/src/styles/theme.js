@@ -56,6 +56,10 @@ export const lightColors = {
   graphFeasibleFill: 'rgba(0, 106, 102, 0.12)',
   graphFeasibleStroke: 'rgba(0, 106, 102, 0.35)',
   themeColorMeta: '#006a66',
+  glassBg: 'rgba(248, 249, 255, 0.6)',
+  glassBorder: 'rgba(255, 255, 255, 0.5)',
+  glassShadow: '0 8px 32px rgba(13, 28, 46, 0.12)',
+  glassHighlight: 'linear-gradient(180deg, rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0) 60%)',
 };
 
 export const darkColors = {
@@ -116,6 +120,10 @@ export const darkColors = {
   graphFeasibleFill: 'rgba(78, 218, 211, 0.15)',
   graphFeasibleStroke: 'rgba(78, 218, 211, 0.4)',
   themeColorMeta: '#0d1c2e',
+  glassBg: 'rgba(18, 31, 50, 0.55)',
+  glassBorder: 'rgba(184, 196, 220, 0.14)',
+  glassShadow: '0 8px 32px rgba(0, 0, 0, 0.45)',
+  glassHighlight: 'linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 60%)',
 };
 
 export const fonts = {

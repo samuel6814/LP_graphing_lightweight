@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import { ArrowRight } from 'lucide-react';
-import { useHeroStagger } from '../../hooks/useGsapReveal';
+import { useHeroStagger, useHeroGraph } from '../../hooks/useGsapReveal';
 import { ROUTES } from '../../utils/routes';
 import { PageSection, ContentContainer } from '../../styles/layout';
 import media from '../../styles/media';
@@ -135,6 +135,7 @@ export default function Hero() {
   const ref = useRef(null);
   const { colors } = useTheme();
   useHeroStagger(ref);
+  useHeroGraph(ref);
 
   return (
     <HeroSection ref={ref}>
@@ -152,19 +153,55 @@ export default function Hero() {
             </PrimaryCta>
           </CtaRow>
         </Copy>
-        <HeroVisual data-hero>
-          <svg viewBox="0 0 400 280" fill="none">
-            <line x1="0" y1="140" x2="400" y2="140" stroke={colors.graphAxis} strokeWidth="1.5" opacity="0.4" />
-            <line x1="200" y1="0" x2="200" y2="280" stroke={colors.graphAxis} strokeWidth="1.5" opacity="0.4" />
-            <path d="M 40 220 L 120 60 L 200 140 L 360 40" stroke={colors.plotTeal} strokeWidth="3" fill="none" />
-            <path d="M 80 260 Q 200 20 320 200" stroke={colors.plotMagenta} strokeWidth="3" fill="none" />
-            <polygon
-              points="120,60 200,140 80,200"
-              fill={colors.graphFeasibleFill}
-              stroke={colors.plotTeal}
-              strokeWidth="1.5"
-              strokeDasharray="6 4"
-            />
+        <HeroVisual data-hero data-hero-visual>
+          <svg viewBox="0 0 400 280" fill="none" aria-hidden="true">
+            <g data-hero-graph-group>
+              <line
+                data-hero-axis
+                x1="0"
+                y1="140"
+                x2="400"
+                y2="140"
+                stroke={colors.graphAxis}
+                strokeWidth="1.5"
+                opacity="0"
+              />
+              <line
+                data-hero-axis
+                x1="200"
+                y1="0"
+                x2="200"
+                y2="280"
+                stroke={colors.graphAxis}
+                strokeWidth="1.5"
+                opacity="0"
+              />
+              <polygon
+                data-hero-region
+                points="120,60 200,140 80,200"
+                fill={colors.graphFeasibleFill}
+                stroke={colors.plotTeal}
+                strokeWidth="1.5"
+                strokeDasharray="6 4"
+              />
+              <path
+                data-hero-line
+                d="M 40 220 L 120 60 L 200 140 L 360 40"
+                stroke={colors.plotTeal}
+                strokeWidth="3"
+                fill="none"
+              />
+              <path
+                data-hero-line
+                d="M 80 260 Q 200 20 320 200"
+                stroke={colors.plotMagenta}
+                strokeWidth="3"
+                fill="none"
+              />
+              <circle data-hero-dot cx="120" cy="60" r="5" fill={colors.plotTeal} />
+              <circle data-hero-dot cx="200" cy="140" r="5" fill={colors.plotTeal} />
+              <circle data-hero-dot cx="80" cy="200" r="5" fill={colors.plotTeal} />
+            </g>
           </svg>
         </HeroVisual>
       </Grid>

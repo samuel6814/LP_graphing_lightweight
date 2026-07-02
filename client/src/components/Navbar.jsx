@@ -1,30 +1,70 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { LineChart, Menu, X } from 'lucide-react';
 import { ROUTES } from '../utils/routes';
 import ThemeToggle from './ThemeToggle';
 import media from '../styles/media';
 
-const Nav = styled.header`
-  position: sticky;
-  top: 0;
+gsap.registerPlugin(ScrollTrigger);
+
+const NavWrap = styled.div`
+  position: fixed;
+  top: calc(${({ theme }) => theme.spacing.md} + env(safe-area-inset-top, 0));
+  left: 0;
+  right: 0;
   z-index: 50;
+  display: flex;
+  justify-content: center;
+  padding: 0 ${({ theme }) => theme.spacing.md};
+  pointer-events: none;
+
+  ${media.mobile} {
+    padding: 0 ${({ theme }) => theme.spacing.sm};
+  }
+`;
+
+const Nav = styled.header`
+  position: relative;
+  pointer-events: auto;
+  width: min(1100px, 100%);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.marginMobile}`};
-  background: ${({ theme }) => theme.colors.surface};
-  border-bottom: 1px solid ${({ theme }) => theme.colors.outlineVariant};
-  backdrop-filter: blur(8px);
+  gap: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.lg}`};
+  border-radius: ${({ theme }) => theme.radii.full};
+  background: ${({ theme }) => theme.colors.glassBg};
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid ${({ theme }) => theme.colors.glassBorder};
+  box-shadow: ${({ theme }) => theme.colors.glassShadow};
 
-  ${media.tablet} {
-    padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.marginTablet}`};
+  ${media.mobile} {
+    padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.md}`};
+    gap: ${({ theme }) => theme.spacing.md};
   }
 
-  ${media.desktop} {
-    padding: ${({ theme }) => `${theme.spacing.md} ${theme.spacing.marginDesktop}`};
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: ${({ theme }) => theme.colors.glassHighlight};
+    pointer-events: none;
   }
+`;
+
+const NavInner = styled.div`
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: ${({ theme }) => theme.spacing.lg};
 `;
 
 const Logo = styled(Link)`
@@ -149,6 +189,7 @@ const MobileCta = styled(Cta)`
 export default function Navbar() {
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const navRef = useRef(null);
 
   useEffect(() => {
     document.body.classList.toggle('nav-open', menuOpen);
@@ -159,34 +200,60 @@ export default function Navbar() {
     setMenuOpen(false);
   }, [pathname]);
 
+  useEffect(() => {
+    const el = navRef.current;
+    if (!el) return undefined;
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) return undefined;
+
+    const trigger = ScrollTrigger.create({
+      start: 'top -40',
+      onUpdate: (self) => {
+        gsap.to(el, {
+          scale: self.direction === 1 ? 0.98 : 1,
+          duration: 0.3,
+          ease: 'power2.out',
+          overwrite: 'auto',
+        });
+      },
+    });
+
+    return () => trigger.kill();
+  }, []);
+
   return (
     <>
-      <Nav>
-        <Logo to={ROUTES.home}>
-          <LineChart size={28} strokeWidth={2.5} />
-          <LogoText>LP Grapher</LogoText>
-        </Logo>
+      <NavWrap>
+        <Nav ref={navRef}>
+          <NavInner>
+          <Logo to={ROUTES.home}>
+            <LineChart size={28} strokeWidth={2.5} />
+            <LogoText>LP Grapher</LogoText>
+          </Logo>
 
-        <DesktopLinks>
-          <NavLink to={ROUTES.home} $active={pathname === ROUTES.home}>
-            Home
-          </NavLink>
-          <NavLink to={ROUTES.learn} $active={pathname.startsWith(ROUTES.learn)}>
-            Learn
-          </NavLink>
-          <ThemeToggle />
-          <Cta to={ROUTES.learn}>Start Learning</Cta>
-        </DesktopLinks>
+          <DesktopLinks>
+            <NavLink to={ROUTES.home} $active={pathname === ROUTES.home}>
+              Home
+            </NavLink>
+            <NavLink to={ROUTES.learn} $active={pathname.startsWith(ROUTES.learn)}>
+              Learn
+            </NavLink>
+            <ThemeToggle />
+            <Cta to={ROUTES.learn}>Start Learning</Cta>
+          </DesktopLinks>
 
-        <MenuBtn
-          type="button"
-          onClick={() => setMenuOpen((o) => !o)}
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={menuOpen}
-        >
-          {menuOpen ? <X size={24} /> : <Menu size={24} />}
-        </MenuBtn>
-      </Nav>
+          <MenuBtn
+            type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+          </MenuBtn>
+        </NavInner>
+        </Nav>
+      </NavWrap>
 
       <Overlay $open={menuOpen} onClick={() => setMenuOpen(false)} />
       <MobileDrawer $open={menuOpen} aria-hidden={!menuOpen}>
