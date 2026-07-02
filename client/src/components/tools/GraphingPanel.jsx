@@ -168,6 +168,57 @@ const ListCompact = styled(List)`
   }
 `;
 
+const ScaleSection = styled.div`
+  padding: ${({ theme }) => `${theme.spacing.sm} ${theme.spacing.md}`};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.outlineVariant};
+  flex-shrink: 0;
+`;
+
+const ScaleTitle = styled.div`
+  font-weight: 600;
+  font-size: 13px;
+  color: ${({ theme }) => theme.colors.primary};
+  margin-bottom: ${({ theme }) => theme.spacing.sm};
+`;
+
+const ScaleGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: ${({ theme }) => theme.spacing.sm};
+  align-items: end;
+
+  ${media.mobile} {
+    grid-template-columns: repeat(2, 1fr);
+  }
+`;
+
+const ScaleField = styled.label`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  color: ${({ theme }) => theme.colors.onSurfaceVariant};
+`;
+
+const ScaleInput = styled.input`
+  padding: 6px 8px;
+  border: 1px solid ${({ theme }) => theme.colors.outlineVariant};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  font-size: 14px;
+  min-height: 36px;
+  width: 100%;
+`;
+
+const ResetScaleBtn = styled.button`
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.primary};
+  border: 1px solid ${({ theme }) => theme.colors.primary};
+  border-radius: ${({ theme }) => theme.radii.sm};
+  min-height: 36px;
+  white-space: nowrap;
+`;
 const LpTitle = styled.div`
   font-weight: 600;
   margin-bottom: 4px;
@@ -193,7 +244,31 @@ function placeholderForMode(mode, expr) {
 }
 
 export default function GraphingPanel() {
-  const { expressions, setExpressions, lpConfig, graphFullscreen, setGraphFullscreen } = useTools();
+  const {
+    expressions,
+    setExpressions,
+    lpConfig,
+    graphFullscreen,
+    setGraphFullscreen,
+    graphScale,
+    setGraphScale,
+    resetGraphScale,
+  } = useTools();
+
+  const updateScale = (key, raw) => {
+    const num = parseFloat(raw);
+    if (!Number.isFinite(num)) return;
+    setGraphScale({ [key]: num });
+  };
+
+  const validateScale = () => {
+    const { xMin, xMax, yMin, yMax, step } = graphScale;
+    const patch = {};
+    if (xMin >= xMax) patch.xMax = xMin + 1;
+    if (yMin >= yMax) patch.yMax = yMin + 1;
+    if (!step || step < 0.1) patch.step = 1;
+    if (Object.keys(patch).length) setGraphScale(patch);
+  };
 
   const updateExpr = (id, patch) => {
     setExpressions((prev) =>
@@ -249,6 +324,68 @@ export default function GraphingPanel() {
           </AddBtn>
         </HeaderActions>
       </Header>
+      <ScaleSection>
+        <ScaleTitle>Scale</ScaleTitle>
+        <ScaleGrid>
+          <ScaleField>
+            X min
+            <ScaleInput
+              type="number"
+              step="any"
+              value={graphScale.xMin}
+              onChange={(e) => updateScale('xMin', e.target.value)}
+              onBlur={validateScale}
+            />
+          </ScaleField>
+          <ScaleField>
+            X max
+            <ScaleInput
+              type="number"
+              step="any"
+              value={graphScale.xMax}
+              onChange={(e) => updateScale('xMax', e.target.value)}
+              onBlur={validateScale}
+            />
+          </ScaleField>
+          <ScaleField>
+            Y min
+            <ScaleInput
+              type="number"
+              step="any"
+              value={graphScale.yMin}
+              onChange={(e) => updateScale('yMin', e.target.value)}
+              onBlur={validateScale}
+            />
+          </ScaleField>
+          <ScaleField>
+            Y max
+            <ScaleInput
+              type="number"
+              step="any"
+              value={graphScale.yMax}
+              onChange={(e) => updateScale('yMax', e.target.value)}
+              onBlur={validateScale}
+            />
+          </ScaleField>
+          <ScaleField>
+            Step
+            <ScaleInput
+              type="number"
+              step="0.1"
+              min="0.1"
+              value={graphScale.step}
+              onChange={(e) => updateScale('step', e.target.value)}
+              onBlur={validateScale}
+            />
+          </ScaleField>
+          <ScaleField>
+            &nbsp;
+            <ResetScaleBtn type="button" onClick={resetGraphScale}>
+              Reset
+            </ResetScaleBtn>
+          </ScaleField>
+        </ScaleGrid>
+      </ScaleSection>
       {(lpConfig || expressions.length > 0) && (
         <ListCompact $compact={graphFullscreen}>
           {lpConfig && (

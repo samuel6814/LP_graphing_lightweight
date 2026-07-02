@@ -1,5 +1,6 @@
 import { createContext, useContext, useMemo, useState, useCallback } from 'react';
 import { getPlotColor, plotLabel } from '../utils/plotSampler';
+import { DEFAULT_GRAPH_SCALE } from '../utils/axisTicks';
 
 const ToolsContext = createContext(null);
 
@@ -11,6 +12,7 @@ export function ToolsProvider({ children }) {
   const [isOpen, setIsOpenState] = useState(false);
   const [activeTab, setActiveTabState] = useState('graph');
   const [graphFullscreen, setGraphFullscreen] = useState(false);
+  const [graphScale, setGraphScaleState] = useState(DEFAULT_GRAPH_SCALE);
   const [expressions, setExpressions] = useState(DEFAULT_EXPRESSIONS);
   const [lpConfig, setLpConfig] = useState(null);
   const [calcDisplay, setCalcDisplay] = useState('0');
@@ -25,6 +27,14 @@ export function ToolsProvider({ children }) {
   const setActiveTab = useCallback((tab) => {
     setActiveTabState(tab);
     if (tab !== 'graph') setGraphFullscreen(false);
+  }, []);
+
+  const setGraphScale = useCallback((patch) => {
+    setGraphScaleState((prev) => ({ ...prev, ...patch }));
+  }, []);
+
+  const resetGraphScale = useCallback(() => {
+    setGraphScaleState(DEFAULT_GRAPH_SCALE);
   }, []);
 
   const loadTopicGraph = useCallback((defaultGraph) => {
@@ -62,6 +72,9 @@ export function ToolsProvider({ children }) {
       setActiveTab,
       graphFullscreen,
       setGraphFullscreen,
+      graphScale,
+      setGraphScale,
+      resetGraphScale,
       expressions,
       setExpressions,
       lpConfig,
@@ -81,6 +94,7 @@ export function ToolsProvider({ children }) {
       activeTab,
       setActiveTab,
       graphFullscreen,
+      graphScale,
       expressions,
       lpConfig,
       calcDisplay,
@@ -88,6 +102,8 @@ export function ToolsProvider({ children }) {
       solverSteps,
       loadTopicGraph,
       loadSolverSteps,
+      setGraphScale,
+      resetGraphScale,
     ],
   );
 

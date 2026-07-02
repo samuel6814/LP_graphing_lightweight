@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { lineFromConstraint, parseObjective, worldToSvg } from '../../utils/graphHelpers';
 import { feasibleRegionPolygon } from '../../utils/feasibleRegion';
 import { samplePlot } from '../../utils/plotSampler';
+import { buildAxisTicks, pixelsPerUnit } from '../../utils/axisTicks';
+import { useTools } from '../../context/ToolsContext';
 import { useResizeObserver } from '../../hooks/useResizeObserver';
 
 const Canvas = styled.div`
@@ -14,7 +16,7 @@ const Canvas = styled.div`
   background-image:
     linear-gradient(to right, rgba(117, 119, 126, 0.1) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(117, 119, 126, 0.1) 1px, transparent 1px);
-  background-size: 40px 40px;
+  background-size: ${({ $gridX, $gridY }) => `${$gridX}px ${$gridY}px`};
   border-radius: ${({ theme }) => theme.radii.lg};
   overflow: hidden;
 `;
@@ -35,16 +37,7 @@ const PLOT_COLORS = {
 
 const AXIS_COLOR = '#45464e';
 const LABEL_STYLE = { fontSize: 11, fill: AXIS_COLOR, fontFamily: 'system-ui, sans-serif' };
-
-function buildTicks(min, max, count = 6) {
-  const step = (max - min) / (count - 1);
-  const ticks = [];
-  for (let i = 0; i < count; i++) {
-    const v = min + i * step;
-    ticks.push(Math.round(v * 10) / 10);
-  }
-  return ticks;
-}
+const MINOR_LABEL_STYLE = { fontSize: 9, fill: AXIS_COLOR, fontFamily: 'system-ui, sans-serif', opacity: 0.75 };
 
 function pointsToPath(points, w, h, xRange, yRange) {
   return points
@@ -55,13 +48,83 @@ function pointsToPath(points, w, h, xRange, yRange) {
     .join(' ');
 }
 
+function renderXTicks(ticks, axisY, w, h, xRange, yRange, pad, hideZeroLabel) {
+  return ticks.map((tick) => {
+    const { sx } = worldToSvg(tick.value, 0, w, h, xRange, yRange);
+    const isMajor = tick.type === 'major';
+    const hideLabel = hideZeroLabel && Math.abs(tick.value) < 0.01;
+    return (
+      <g key={`x-${tick.value}-${tick.type}`}>
+        <line
+          x1={sx}
+          y1={axisY - (isMajor ? 5 : 3)}
+          x2={sx}
+          y2={axisY + (isMajor ? 5 : 3)}
+          stroke={AXIS_COLOR}
+          strokeWidth="1"
+          opacity={isMajor ? 0.5 : 0.25}
+        />
+        {!hideLabel && tick.label && (
+          <text
+            x={sx}
+            y={Math.min(h - 4, axisY + pad)}
+            textAnchor="middle"
+            {...(isMajor ? LABEL_STYLE : MINOR_LABEL_STYLE)}
+          >
+            {tick.label}
+          </text>
+        )}
+      </g>
+    );
+  });
+}
+
+function renderYTicks(ticks, axisX, w, h, xRange, yRange, pad, hideZeroLabel) {
+  return ticks.map((tick) => {
+    const { sy } = worldToSvg(0, tick.value, w, h, xRange, yRange);
+    const isMajor = tick.type === 'major';
+    const hideLabel = hideZeroLabel && Math.abs(tick.value) < 0.01;
+    return (
+      <g key={`y-${tick.value}-${tick.type}`}>
+        <line
+          x1={axisX - (isMajor ? 5 : 3)}
+          y1={sy}
+          x2={axisX + (isMajor ? 5 : 3)}
+          y2={sy}
+          stroke={AXIS_COLOR}
+          strokeWidth="1"
+          opacity={isMajor ? 0.5 : 0.25}
+        />
+        {!hideLabel && tick.label && (
+          <text
+            x={Math.max(4, axisX - pad)}
+            y={sy + 4}
+            textAnchor="end"
+            {...(isMajor ? LABEL_STYLE : MINOR_LABEL_STYLE)}
+          >
+            {tick.label}
+          </text>
+        )}
+      </g>
+    );
+  });
+}
+
 export default function GraphCanvas({ expressions = [], lpConfig = null }) {
+  const { graphScale } = useTools();
   const [containerRef, { width, height }] = useResizeObserver();
-  const xRange = [-1, 10];
-  const yRange = [-2, 12];
+
+  const xRange = [graphScale.xMin, graphScale.xMax];
+  const yRange = [graphScale.yMin, graphScale.yMax];
+  const majorStep = graphScale.step || 1;
 
   const w = width || 600;
   const h = height || 400;
+
+  const pxPerX = pixelsPerUnit(graphScale.xMin, graphScale.xMax, w);
+  const pxPerY = pixelsPerUnit(graphScale.yMin, graphScale.yMax, h);
+  const gridX = Math.max(8, pxPerX * majorStep);
+  const gridY = Math.max(8, pxPerY * majorStep);
 
   const feasiblePolygon = useMemo(() => {
     if (!lpConfig?.constraints) return null;
@@ -73,7 +136,7 @@ export default function GraphCanvas({ expressions = [], lpConfig = null }) {
         return `${sx},${sy}`;
       })
       .join(' ');
-  }, [lpConfig, w, h]);
+  }, [lpConfig, w, h, graphScale]);
 
   const paths = useMemo(() => {
     const result = [];
@@ -100,7 +163,7 @@ export default function GraphCanvas({ expressions = [], lpConfig = null }) {
 
       if (lpConfig.objective) {
         const obj = parseObjective(lpConfig.objective);
-        const k = 12;
+        const k = graphScale.yMax;
         const pts = [];
         for (let x = xRange[0]; x <= xRange[1]; x += 1) {
           const y = (k - obj.coeffs.x * x) / (obj.coeffs.y || 1);
@@ -137,45 +200,49 @@ export default function GraphCanvas({ expressions = [], lpConfig = null }) {
       });
 
     return result;
-  }, [expressions, lpConfig, w, h]);
+  }, [expressions, lpConfig, w, h, graphScale]);
 
   const axisX = worldToSvg(0, 0, w, h, xRange, yRange).sy;
   const axisY = worldToSvg(0, 0, w, h, xRange, yRange).sx;
-  const xTicks = buildTicks(xRange[0], xRange[1]);
-  const yTicks = buildTicks(yRange[0], yRange[1]);
   const pad = 14;
 
+  const xAxisTicks = useMemo(() => {
+    const { major, minor } = buildAxisTicks(graphScale.xMin, graphScale.xMax, majorStep, 0.1, pxPerX);
+    return [
+      ...minor.map((t) => ({ ...t, type: 'minor' })),
+      ...major.map((t) => ({ ...t, type: 'major' })),
+    ];
+  }, [graphScale, majorStep, pxPerX]);
+
+  const yAxisTicks = useMemo(() => {
+    const { major, minor } = buildAxisTicks(graphScale.yMin, graphScale.yMax, majorStep, 0.1, pxPerY);
+    return [
+      ...minor.map((t) => ({ ...t, type: 'minor' })),
+      ...major.map((t) => ({ ...t, type: 'major' })),
+    ];
+  }, [graphScale, majorStep, pxPerY]);
+
+  const originVisible =
+    graphScale.xMin <= 0 &&
+    graphScale.xMax >= 0 &&
+    graphScale.yMin <= 0 &&
+    graphScale.yMax >= 0;
+
   return (
-    <Canvas ref={containerRef}>
+    <Canvas ref={containerRef} $gridX={gridX} $gridY={gridY}>
       <Svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
         {feasiblePolygon && (
           <polygon points={feasiblePolygon} fill="rgba(0, 106, 102, 0.12)" stroke="none" />
         )}
         <line x1={0} y1={axisX} x2={w} y2={axisX} stroke={AXIS_COLOR} strokeWidth="1.5" opacity="0.5" />
         <line x1={axisY} y1={0} x2={axisY} y2={h} stroke={AXIS_COLOR} strokeWidth="1.5" opacity="0.5" />
-        {xTicks.map((v) => {
-          const { sx, sy } = worldToSvg(v, 0, w, h, xRange, yRange);
-          return (
-            <g key={`x-${v}`}>
-              <line x1={sx} y1={axisX - 4} x2={sx} y2={axisX + 4} stroke={AXIS_COLOR} strokeWidth="1" opacity="0.4" />
-              <text x={sx} y={Math.min(h - 4, axisX + pad)} textAnchor="middle" {...LABEL_STYLE}>
-                {v}
-              </text>
-            </g>
-          );
-        })}
-        {yTicks.map((v) => {
-          if (Math.abs(v) < 0.01) return null;
-          const { sx, sy } = worldToSvg(0, v, w, h, xRange, yRange);
-          return (
-            <g key={`y-${v}`}>
-              <line x1={axisY - 4} y1={sy} x2={axisY + 4} y2={sy} stroke={AXIS_COLOR} strokeWidth="1" opacity="0.4" />
-              <text x={Math.max(4, axisY - pad)} y={sy + 4} textAnchor="end" {...LABEL_STYLE}>
-                {v}
-              </text>
-            </g>
-          );
-        })}
+        {renderXTicks(xAxisTicks, axisX, w, h, xRange, yRange, pad, originVisible)}
+        {renderYTicks(yAxisTicks, axisY, w, h, xRange, yRange, pad, originVisible)}
+        {originVisible && (
+          <text x={Math.max(8, axisY + pad)} y={Math.min(h - 4, axisX + pad)} textAnchor="start" {...LABEL_STYLE}>
+            0
+          </text>
+        )}
         <text x={w - 8} y={Math.min(h - 6, axisX + pad)} textAnchor="end" {...LABEL_STYLE}>
           x
         </text>
