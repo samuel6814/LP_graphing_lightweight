@@ -1,5 +1,5 @@
 import { useRef, useMemo, useId, forwardRef, useImperativeHandle } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { lineFromConstraint, parseObjective, worldToSvg } from '../../utils/graphHelpers';
 import { feasibleRegionPolygon } from '../../utils/feasibleRegion';
 import { solveGraphicalLP, formatCoord } from '../../utils/lpSolver';
@@ -13,7 +13,7 @@ const Canvas = styled.div`
   width: 100%;
   height: 100%;
   min-height: 200px;
-  background: #fff;
+  background: ${({ theme }) => theme.colors.graphBackground};
   border-radius: ${({ theme }) => theme.radii.lg};
   overflow: hidden;
 `;
@@ -25,16 +25,22 @@ const Svg = styled.svg`
   height: 100%;
 `;
 
-const PLOT_COLORS = {
-  teal: '#006a66',
-  magenta: '#d81b60',
-  indigo: '#182442',
-  amber: '#e65100',
-};
+const PLOT_AMBER = '#e65100';
 
-const AXIS_COLOR = '#45464e';
-const LABEL_STYLE = { fontSize: 11, fill: AXIS_COLOR, fontFamily: 'system-ui, sans-serif' };
-const MINOR_LABEL_STYLE = { fontSize: 9, fill: AXIS_COLOR, fontFamily: 'system-ui, sans-serif', opacity: 0.75 };
+function labelStyle(axisColor, isMajor = true) {
+  return isMajor
+    ? { fontSize: 11, fill: axisColor, fontFamily: 'system-ui, sans-serif' }
+    : { fontSize: 9, fill: axisColor, fontFamily: 'system-ui, sans-serif', opacity: 0.75 };
+}
+
+function plotColors(colors) {
+  return {
+    teal: colors.plotTeal,
+    magenta: colors.plotMagenta,
+    indigo: colors.plotIndigo,
+    amber: PLOT_AMBER,
+  };
+}
 
 function pointsToPath(points, w, h, xRange, yRange) {
   return points
@@ -45,7 +51,9 @@ function pointsToPath(points, w, h, xRange, yRange) {
     .join(' ');
 }
 
-function renderXTicks(ticks, axisY, w, h, xRange, yRange, pad, hideZeroLabel) {
+function renderXTicks(ticks, axisY, w, h, xRange, yRange, pad, hideZeroLabel, axisColor) {
+  const LABEL_STYLE = labelStyle(axisColor, true);
+  const MINOR_LABEL_STYLE = labelStyle(axisColor, false);
   return ticks.map((tick) => {
     const { sx } = worldToSvg(tick.value, 0, w, h, xRange, yRange);
     const isMajor = tick.type === 'major';
@@ -57,7 +65,7 @@ function renderXTicks(ticks, axisY, w, h, xRange, yRange, pad, hideZeroLabel) {
           y1={axisY - (isMajor ? 5 : 3)}
           x2={sx}
           y2={axisY + (isMajor ? 5 : 3)}
-          stroke={AXIS_COLOR}
+          stroke={axisColor}
           strokeWidth="1"
           opacity={isMajor ? 0.5 : 0.25}
         />
@@ -76,7 +84,9 @@ function renderXTicks(ticks, axisY, w, h, xRange, yRange, pad, hideZeroLabel) {
   });
 }
 
-function renderYTicks(ticks, axisX, w, h, xRange, yRange, pad, hideZeroLabel) {
+function renderYTicks(ticks, axisX, w, h, xRange, yRange, pad, hideZeroLabel, axisColor) {
+  const LABEL_STYLE = labelStyle(axisColor, true);
+  const MINOR_LABEL_STYLE = labelStyle(axisColor, false);
   return ticks.map((tick) => {
     const { sy } = worldToSvg(0, tick.value, w, h, xRange, yRange);
     const isMajor = tick.type === 'major';
@@ -88,7 +98,7 @@ function renderYTicks(ticks, axisX, w, h, xRange, yRange, pad, hideZeroLabel) {
           y1={sy}
           x2={axisX + (isMajor ? 5 : 3)}
           y2={sy}
-          stroke={AXIS_COLOR}
+          stroke={axisColor}
           strokeWidth="1"
           opacity={isMajor ? 0.5 : 0.25}
         />
@@ -107,13 +117,13 @@ function renderYTicks(ticks, axisX, w, h, xRange, yRange, pad, hideZeroLabel) {
   });
 }
 
-function buildGridPattern(gridX, gridY, patternId) {
+function buildGridPattern(gridX, gridY, patternId, gridColor) {
   return (
     <pattern id={patternId} width={gridX} height={gridY} patternUnits="userSpaceOnUse">
       <path
         d={`M ${gridX} 0 L 0 0 0 ${gridY}`}
         fill="none"
-        stroke="rgba(117, 119, 126, 0.1)"
+        stroke={gridColor}
         strokeWidth="1"
       />
     </pattern>
@@ -133,6 +143,11 @@ function buildObjectiveLine(obj, k, xRange) {
 
 const GraphCanvas = forwardRef(function GraphCanvas({ expressions = [], lpConfig = null }, ref) {
   const { graphScale } = useTools();
+  const theme = useTheme();
+  const { colors } = theme;
+  const PLOT_COLORS = plotColors(colors);
+  const axisColor = colors.graphAxis;
+  const LABEL_STYLE = labelStyle(axisColor, true);
   const [containerRef, { width, height }] = useResizeObserver();
   const svgRef = useRef(null);
   const gridPatternId = useId().replace(/:/g, '');
@@ -232,7 +247,7 @@ const GraphCanvas = forwardRef(function GraphCanvas({ expressions = [], lpConfig
       });
 
     return result;
-  }, [expressions, lpConfig, w, h, graphScale, lpSolution]);
+  }, [expressions, lpConfig, w, h, graphScale, lpSolution, colors]);
 
   const axisX = worldToSvg(0, 0, w, h, xRange, yRange).sy;
   const axisY = worldToSvg(0, 0, w, h, xRange, yRange).sx;
@@ -268,15 +283,16 @@ const GraphCanvas = forwardRef(function GraphCanvas({ expressions = [], lpConfig
   return (
     <Canvas ref={containerRef}>
       <Svg ref={svgRef} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
-        <defs>{buildGridPattern(gridX, gridY, gridPatternId)}</defs>
+        <defs>{buildGridPattern(gridX, gridY, gridPatternId, colors.graphGrid)}</defs>
+        <rect width={w} height={h} fill={colors.graphBackground} />
         <rect width={w} height={h} fill={`url(#${gridPatternId})`} />
         {feasiblePolygon && (
-          <polygon points={feasiblePolygon} fill="rgba(0, 106, 102, 0.12)" stroke="none" />
+          <polygon points={feasiblePolygon} fill={colors.graphFeasibleFill} stroke="none" />
         )}
-        <line x1={0} y1={axisX} x2={w} y2={axisX} stroke={AXIS_COLOR} strokeWidth="1.5" opacity="0.5" />
-        <line x1={axisY} y1={0} x2={axisY} y2={h} stroke={AXIS_COLOR} strokeWidth="1.5" opacity="0.5" />
-        {renderXTicks(xAxisTicks, axisX, w, h, xRange, yRange, pad, originVisible)}
-        {renderYTicks(yAxisTicks, axisY, w, h, xRange, yRange, pad, originVisible)}
+        <line x1={0} y1={axisX} x2={w} y2={axisX} stroke={axisColor} strokeWidth="1.5" opacity="0.5" />
+        <line x1={axisY} y1={0} x2={axisY} y2={h} stroke={axisColor} strokeWidth="1.5" opacity="0.5" />
+        {renderXTicks(xAxisTicks, axisX, w, h, xRange, yRange, pad, originVisible, axisColor)}
+        {renderYTicks(yAxisTicks, axisY, w, h, xRange, yRange, pad, originVisible, axisColor)}
         {originVisible && (
           <text x={Math.max(8, axisY + pad)} y={Math.min(h - 4, axisX + pad)} textAnchor="start" {...LABEL_STYLE}>
             0
@@ -340,7 +356,7 @@ const GraphCanvas = forwardRef(function GraphCanvas({ expressions = [], lpConfig
               cx={sx}
               cy={sy}
               r={4}
-              fill="rgba(0, 106, 102, 0.35)"
+              fill={colors.graphFeasibleStroke}
               stroke={PLOT_COLORS.teal}
               strokeWidth="1.5"
             />
@@ -350,7 +366,7 @@ const GraphCanvas = forwardRef(function GraphCanvas({ expressions = [], lpConfig
           const { sx, sy } = worldToSvg(opt.x, opt.y, w, h, xRange, yRange);
           return (
             <g key={`opt-${i}`}>
-              <circle cx={sx} cy={sy} r={7} fill={PLOT_COLORS.magenta} stroke="#fff" strokeWidth="2" />
+              <circle cx={sx} cy={sy} r={7} fill={PLOT_COLORS.magenta} stroke={colors.graphBackground} strokeWidth="2" />
               <text
                 x={sx + 10}
                 y={sy - 8}

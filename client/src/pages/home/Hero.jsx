@@ -1,6 +1,6 @@
 import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { ArrowRight } from 'lucide-react';
 import { useHeroStagger } from '../../hooks/useGsapReveal';
 import { ROUTES } from '../../utils/routes';
@@ -117,8 +117,8 @@ const HeroVisual = styled.div`
     position: absolute;
     inset: 0;
     background-image:
-      linear-gradient(to right, rgba(117, 119, 126, 0.08) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(117, 119, 126, 0.08) 1px, transparent 1px);
+      linear-gradient(to right, ${({ theme }) => theme.colors.graphGrid} 1px, transparent 1px),
+      linear-gradient(to bottom, ${({ theme }) => theme.colors.graphGrid} 1px, transparent 1px);
     background-size: 32px 32px;
   }
 
@@ -133,6 +133,7 @@ const HeroVisual = styled.div`
 
 export default function Hero() {
   const ref = useRef(null);
+  const { colors } = useTheme();
   useHeroStagger(ref);
 
   return (
@@ -153,11 +154,17 @@ export default function Hero() {
         </Copy>
         <HeroVisual data-hero>
           <svg viewBox="0 0 400 280" fill="none">
-            <line x1="0" y1="140" x2="400" y2="140" stroke="#45464e" strokeWidth="1.5" opacity="0.4" />
-            <line x1="200" y1="0" x2="200" y2="280" stroke="#45464e" strokeWidth="1.5" opacity="0.4" />
-            <path d="M 40 220 L 120 60 L 200 140 L 360 40" stroke="#006a66" strokeWidth="3" fill="none" />
-            <path d="M 80 260 Q 200 20 320 200" stroke="#d81b60" strokeWidth="3" fill="none" />
-            <polygon points="120,60 200,140 80,200" fill="rgba(0,106,102,0.12)" stroke="#006a66" strokeWidth="1.5" strokeDasharray="6 4" />
+            <line x1="0" y1="140" x2="400" y2="140" stroke={colors.graphAxis} strokeWidth="1.5" opacity="0.4" />
+            <line x1="200" y1="0" x2="200" y2="280" stroke={colors.graphAxis} strokeWidth="1.5" opacity="0.4" />
+            <path d="M 40 220 L 120 60 L 200 140 L 360 40" stroke={colors.plotTeal} strokeWidth="3" fill="none" />
+            <path d="M 80 260 Q 200 20 320 200" stroke={colors.plotMagenta} strokeWidth="3" fill="none" />
+            <polygon
+              points="120,60 200,140 80,200"
+              fill={colors.graphFeasibleFill}
+              stroke={colors.plotTeal}
+              strokeWidth="1.5"
+              strokeDasharray="6 4"
+            />
           </svg>
         </HeroVisual>
       </Grid>

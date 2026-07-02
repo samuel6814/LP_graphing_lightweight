@@ -2,8 +2,6 @@ import { createGlobalStyle } from 'styled-components';
 import { devices } from './theme';
 
 const GlobalStyle = createGlobalStyle`
-  @import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&family=Hanken+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap');
-
   :root {
     --breakpoint-mobile-max: ${devices.mobile};
   }
@@ -16,6 +14,7 @@ const GlobalStyle = createGlobalStyle`
 
   html {
     scroll-behavior: smooth;
+    color-scheme: ${({ theme }) => theme.mode};
   }
 
   body {

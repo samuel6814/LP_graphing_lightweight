@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
-import theme from './styles/theme';
 import GlobalStyle from './styles/GlobalStyle';
 import './styles/katex-overrides.css';
+import { ThemeModeProvider, useThemeMode } from './context/ThemeModeContext';
 import { ToolsProvider } from './context/ToolsContext';
 import { TopicProgressProvider } from './context/TopicProgressContext';
 import HomeLayout from './pages/home/HomeLayout';
@@ -13,7 +13,9 @@ import LearnHub from './pages/learn/LearnHub';
 import TopicPage from './pages/learn/TopicPage';
 import NotFound from './pages/NotFound';
 
-export default function App() {
+function ThemedApp() {
+  const { theme } = useThemeMode();
+
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
@@ -36,5 +38,13 @@ export default function App() {
         </ToolsProvider>
       </BrowserRouter>
     </ThemeProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <ThemeModeProvider>
+      <ThemedApp />
+    </ThemeModeProvider>
   );
 }

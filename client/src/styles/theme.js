@@ -1,4 +1,4 @@
-export const colors = {
+export const lightColors = {
   surface: '#f8f9ff',
   surfaceDim: '#ccdbf3',
   surfaceBright: '#f8f9ff',
@@ -49,6 +49,73 @@ export const colors = {
   plotTeal: '#006a66',
   plotMagenta: '#d81b60',
   plotIndigo: '#182442',
+  overlay: 'rgba(13, 28, 46, 0.45)',
+  graphBackground: '#ffffff',
+  graphGrid: 'rgba(117, 119, 126, 0.1)',
+  graphAxis: '#45464e',
+  graphFeasibleFill: 'rgba(0, 106, 102, 0.12)',
+  graphFeasibleStroke: 'rgba(0, 106, 102, 0.35)',
+  themeColorMeta: '#006a66',
+};
+
+export const darkColors = {
+  surface: '#0d1c2e',
+  surfaceDim: '#0d1c2e',
+  surfaceBright: '#3a4a5e',
+  surfaceContainerLowest: '#081220',
+  surfaceContainerLow: '#121f32',
+  surfaceContainer: '#1a2a40',
+  surfaceContainerHigh: '#233144',
+  surfaceContainerHighest: '#2e3a59',
+  onSurface: '#eaf1ff',
+  onSurfaceVariant: '#b8c4dc',
+  inverseSurface: '#eaf1ff',
+  inverseOnSurface: '#233144',
+  outline: '#8a93a8',
+  outlineVariant: '#3a4a5e',
+  surfaceTint: '#bac6ec',
+  primary: '#bac6ec',
+  onPrimary: '#0d1a38',
+  primaryContainer: '#3a4666',
+  onPrimaryContainer: '#dae2ff',
+  inversePrimary: '#3a4666',
+  secondary: '#4edad3',
+  onSecondary: '#00201e',
+  secondaryContainer: '#00504c',
+  onSecondaryContainer: '#70f7ef',
+  tertiary: '#ffb2bf',
+  onTertiary: '#3f0016',
+  tertiaryContainer: '#90003b',
+  onTertiaryContainer: '#ffd9de',
+  error: '#ffb4ab',
+  onError: '#690005',
+  errorContainer: '#93000a',
+  onErrorContainer: '#ffdad6',
+  primaryFixed: '#dae2ff',
+  primaryFixedDim: '#bac6ec',
+  onPrimaryFixed: '#0d1a38',
+  onPrimaryFixedVariant: '#3a4666',
+  secondaryFixed: '#70f7ef',
+  secondaryFixedDim: '#4edad3',
+  onSecondaryFixed: '#00201e',
+  onSecondaryFixedVariant: '#00504c',
+  tertiaryFixed: '#ffd9de',
+  tertiaryFixedDim: '#ffb2bf',
+  onTertiaryFixed: '#3f0016',
+  onTertiaryFixedVariant: '#90003b',
+  background: '#0d1c2e',
+  onBackground: '#eaf1ff',
+  surfaceVariant: '#2e3a59',
+  plotTeal: '#4edad3',
+  plotMagenta: '#ff6b9d',
+  plotIndigo: '#bac6ec',
+  overlay: 'rgba(0, 0, 0, 0.55)',
+  graphBackground: '#121f32',
+  graphGrid: 'rgba(184, 196, 220, 0.12)',
+  graphAxis: '#b8c4dc',
+  graphFeasibleFill: 'rgba(78, 218, 211, 0.15)',
+  graphFeasibleStroke: 'rgba(78, 218, 211, 0.4)',
+  themeColorMeta: '#0d1c2e',
 };
 
 export const fonts = {
@@ -103,8 +170,14 @@ export const radii = {
 };
 
 export const shadows = {
-  popover: '0px 4px 12px rgba(24, 36, 66, 0.08)',
-  card: '0 1px 3px rgba(24, 36, 66, 0.06)',
+  light: {
+    popover: '0px 4px 12px rgba(24, 36, 66, 0.08)',
+    card: '0 1px 3px rgba(24, 36, 66, 0.06)',
+  },
+  dark: {
+    popover: '0px 4px 16px rgba(0, 0, 0, 0.35)',
+    card: '0 1px 3px rgba(0, 0, 0, 0.25)',
+  },
 };
 
 export const breakpoints = {
@@ -121,5 +194,23 @@ export const devices = {
   desktop: '1024px',
 };
 
-const theme = { colors, fonts, typography, spacing, radii, shadows, breakpoints, devices };
+export function buildTheme(mode = 'light') {
+  const isDark = mode === 'dark';
+  return {
+    mode,
+    colors: isDark ? darkColors : lightColors,
+    fonts,
+    typography,
+    spacing,
+    radii,
+    shadows: isDark ? shadows.dark : shadows.light,
+    breakpoints,
+    devices,
+  };
+}
+
+/** @deprecated use buildTheme('light') */
+export const colors = lightColors;
+
+const theme = buildTheme('light');
 export default theme;

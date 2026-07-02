@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { Search, CheckCircle, ArrowRight } from 'lucide-react';
 import { topics, modules, getModuleTitle } from '../../data/topicRegistry';
 import { getTopicPath } from '../../utils/routes';
@@ -150,6 +150,7 @@ const CardFooter = styled.div`
 export default function LearnHub() {
   const [query, setQuery] = useState('');
   const { isComplete } = useTopicProgress();
+  const { colors } = useTheme();
   const schemas = useMemo(() => learnHubSchemas(), []);
 
   usePageMeta({
@@ -213,7 +214,7 @@ export default function LearnHub() {
                 <Card key={t.slug} to={getTopicPath(t.slug)}>
                   <CardTop>
                     <CardTitle>{t.title}</CardTitle>
-                    {isComplete(t.slug) && <CheckCircle size={18} color="#006a66" />}
+                    {isComplete(t.slug) && <CheckCircle size={18} color={colors.secondary} />}
                   </CardTop>
                   <CardSummary>{t.summary}</CardSummary>
                   <CardFooter>

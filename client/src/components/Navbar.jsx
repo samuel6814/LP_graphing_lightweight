@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 import { LineChart, Menu, X } from 'lucide-react';
 import { ROUTES } from '../utils/routes';
+import ThemeToggle from './ThemeToggle';
 import media from '../styles/media';
 
 const Nav = styled.header`
@@ -98,7 +99,7 @@ const MenuBtn = styled.button`
 const Overlay = styled.div`
   position: fixed;
   inset: 0;
-  background: rgba(13, 28, 46, 0.45);
+  background: ${({ theme }) => theme.colors.overlay};
   z-index: 50;
   opacity: ${({ $open }) => ($open ? 1 : 0)};
   pointer-events: ${({ $open }) => ($open ? 'auto' : 'none')};
@@ -173,6 +174,7 @@ export default function Navbar() {
           <NavLink to={ROUTES.learn} $active={pathname.startsWith(ROUTES.learn)}>
             Learn
           </NavLink>
+          <ThemeToggle />
           <Cta to={ROUTES.learn}>Start Learning</Cta>
         </DesktopLinks>
 
@@ -194,6 +196,7 @@ export default function Navbar() {
         <MobileNavLink to={ROUTES.learn} $active={pathname.startsWith(ROUTES.learn)}>
           Learn
         </MobileNavLink>
+        <ThemeToggle />
         <MobileCta to={ROUTES.learn} onClick={() => setMenuOpen(false)}>
           Start Learning
         </MobileCta>

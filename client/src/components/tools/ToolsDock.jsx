@@ -35,7 +35,7 @@ const Fab = styled.button`
 const Overlay = styled.div`
   position: fixed;
   inset: 0;
-  background: rgba(13, 28, 46, 0.4);
+  background: ${({ theme }) => theme.colors.overlay};
   z-index: 101;
   display: ${({ $open }) => ($open ? 'block' : 'none')};
 `;
