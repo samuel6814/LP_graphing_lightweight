@@ -13,6 +13,7 @@ import LearnLayout from './components/layout/LearnLayout';
 import LearnHub from './pages/learn/LearnHub';
 import TopicPage from './pages/learn/TopicPage';
 import NotFound from './pages/NotFound';
+import ScrollToTop from './components/ScrollToTop';
 
 function ThemedApp() {
   const { theme } = useThemeMode();
@@ -21,6 +22,7 @@ function ThemedApp() {
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <BrowserRouter>
+        <ScrollToTop />
         <ToolsProvider>
           <TopicProgressProvider>
             <Routes>
