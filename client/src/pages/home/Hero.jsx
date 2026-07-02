@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import { ArrowRight } from 'lucide-react';
-import { useHeroStagger, useHeroGraph } from '../../hooks/useGsapReveal';
+import { useHeroAnimation } from '../../hooks/useGsapReveal';
 import { ROUTES } from '../../utils/routes';
 import { PageSection, ContentContainer } from '../../styles/layout';
 import media from '../../styles/media';
@@ -134,26 +134,25 @@ const HeroVisual = styled.div`
 export default function Hero() {
   const ref = useRef(null);
   const { colors } = useTheme();
-  useHeroStagger(ref);
-  useHeroGraph(ref);
+  useHeroAnimation(ref);
 
   return (
     <HeroSection ref={ref}>
       <Grid>
         <Copy>
-          <Badge data-hero>MATH 466 · Optimization II</Badge>
-          <Title data-hero>Master Linear Programming with Interactive Tools</Title>
-          <Subtitle data-hero>
+          <Badge data-hero-copy>MATH 466 · Optimization II</Badge>
+          <Title data-hero-copy>Master Linear Programming with Interactive Tools</Title>
+          <Subtitle data-hero-copy>
             LP Grapher combines course explainers, practice questions, and always-available graphing,
             calculator, and step-by-step solver tools — built from the KNUST MATH 466 curriculum.
           </Subtitle>
-          <CtaRow data-hero>
+          <CtaRow data-hero-copy>
             <PrimaryCta to={ROUTES.learn}>
               Explore Topics <ArrowRight size={18} />
             </PrimaryCta>
           </CtaRow>
         </Copy>
-        <HeroVisual data-hero data-hero-visual>
+        <HeroVisual data-hero-visual>
           <svg viewBox="0 0 400 280" fill="none" aria-hidden="true">
             <g data-hero-graph-group>
               <line
@@ -198,8 +197,10 @@ export default function Hero() {
                 strokeWidth="3"
                 fill="none"
               />
+              <circle data-hero-dot cx="40" cy="220" r="5" fill={colors.plotTeal} />
               <circle data-hero-dot cx="120" cy="60" r="5" fill={colors.plotTeal} />
               <circle data-hero-dot cx="200" cy="140" r="5" fill={colors.plotTeal} />
+              <circle data-hero-dot cx="360" cy="40" r="5" fill={colors.plotTeal} />
               <circle data-hero-dot cx="80" cy="200" r="5" fill={colors.plotTeal} />
             </g>
           </svg>
