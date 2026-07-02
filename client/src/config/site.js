@@ -3,7 +3,7 @@ export const SITE = {
   tagline: 'Interactive MATH 466 Linear Programming learning',
   description:
     'LP Grapher — Interactive MATH 466 Linear Programming learning with graphing, calculator, and step-by-step solver.',
-  url: import.meta.env.VITE_SITE_URL || 'https://example.com',
+  url: import.meta.env.VITE_SITE_URL || 'https://lp-graph-six.vercel.app',
   locale: 'en',
   github: 'https://github.com/samuel6814/LP_graphing_lightweight',
   course: {

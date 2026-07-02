@@ -10,7 +10,7 @@ import { topics } from '../src/data/topicRegistry.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(__dirname, '../public');
-const SITE_URL = (process.env.VITE_SITE_URL || 'https://example.com').replace(/\/$/, '');
+const SITE_URL = (process.env.VITE_SITE_URL || 'https://lp-graph-six.vercel.app').replace(/\/$/, '');
 const today = new Date().toISOString().slice(0, 10);
 
 mkdirSync(publicDir, { recursive: true });

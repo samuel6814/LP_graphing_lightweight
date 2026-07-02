@@ -2,6 +2,8 @@
 
 Interactive learning app for **MATH 466 — Optimization II** (Linear Programming). Built with React, styled-components, KaTeX, and GSAP.
 
+**Live:** [https://lp-graph-six.vercel.app](https://lp-graph-six.vercel.app)
+
 ## Features
 
 - Landing page with course overview

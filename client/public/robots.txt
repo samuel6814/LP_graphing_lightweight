@@ -11,4 +11,4 @@ Allow: /
 User-agent: PerplexityBot
 Allow: /
 
-Sitemap: https://example.com/sitemap.xml
+Sitemap: https://lp-graph-six.vercel.app/sitemap.xml
