@@ -47,3 +47,9 @@ npm run preview  # production preview
 ## Environment
 
 No other environment variables required for v1 (fully static).
+
+## Security
+
+- HTTP security headers are configured in [`client/vercel.json`](client/vercel.json) (X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy).
+- Run `npm audit` in `client/` before releases; [`client/.npmrc`](client/.npmrc) sets `audit-level=moderate`.
+- Enable **Dependabot** on the GitHub repo (Settings → Code security → Dependabot alerts) for ongoing dependency alerts.
