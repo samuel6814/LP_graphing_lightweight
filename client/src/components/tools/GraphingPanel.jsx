@@ -13,6 +13,9 @@ const Panel = styled.div`
   flex-direction: column;
   height: 100%;
   min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 `;
 
 const Header = styled.div`
@@ -35,12 +38,9 @@ const List = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.spacing.md};
-  max-height: 220px;
-  overflow-y: auto;
   flex-shrink: 0;
 
   ${media.mobile} {
-    max-height: 140px;
     padding: ${({ theme }) => theme.spacing.sm};
   }
 `;
@@ -119,14 +119,16 @@ const ModeSelect = styled.select`
 `;
 
 const GraphArea = styled.div`
-  flex: 1;
+  flex-shrink: 0;
   padding: ${({ theme }) => theme.spacing.md};
-  min-height: 200px;
+  min-height: clamp(200px, 38vh, 360px);
+  height: clamp(200px, 38vh, 360px);
   display: flex;
   flex-direction: column;
 
   ${media.mobile} {
-    min-height: 180px;
+    min-height: clamp(200px, 42vh, 360px);
+    height: clamp(200px, 42vh, 360px);
     padding: ${({ theme }) => theme.spacing.sm};
   }
 `;
@@ -178,11 +180,7 @@ const LpModeBtn = styled(AddBtn)`
 `;
 
 const ListCompact = styled(List)`
-  max-height: ${({ $compact }) => ($compact ? '120px' : '220px')};
-
-  ${media.mobile} {
-    max-height: ${({ $compact }) => ($compact ? '80px' : '140px')};
-  }
+  /* Intentionally no max-height: the panel scrolls as one unit on small screens. */
 `;
 
 const ScaleSection = styled.div`

@@ -33,6 +33,10 @@ const GlobalStyle = createGlobalStyle`
     overflow: hidden;
   }
 
+  body.tools-graph-open {
+    overflow: hidden;
+  }
+
   #root {
     min-height: 100vh;
     display: flex;

@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { LineChart, Calculator, Sparkles, X } from 'lucide-react';
 import { useTools } from '../../context/ToolsContext';
@@ -5,6 +6,7 @@ import GraphingPanel from './GraphingPanel';
 import CalculatorPanel from './CalculatorPanel';
 import StepSolverPanel from './StepSolverPanel';
 import media from '../../styles/media';
+import { devices } from '../../styles/theme';
 
 const Fab = styled.button`
   position: fixed;
@@ -71,6 +73,15 @@ const Dock = styled.div`
 
   ${media.tablet} {
     width: ${({ $fullscreen }) => ($fullscreen ? '100vw' : 'min(400px, 90vw)')};
+  }
+
+  ${media.tabletDown} {
+    ${({ $fullscreen }) =>
+      $fullscreen &&
+      `
+      height: 100dvh;
+      height: 100vh;
+    `}
   }
 
   ${media.mobile} {
@@ -154,7 +165,39 @@ const TABS = [
 
 export default function ToolsDock() {
   const { isOpen, setIsOpen, activeTab, setActiveTab, graphFullscreen } = useTools();
-  const isGraphFullscreen = isOpen && activeTab === 'graph' && graphFullscreen;
+  const [isTabletDown, setIsTabletDown] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia(`(max-width: ${devices.tabletMax})`).matches;
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return undefined;
+    const mq = window.matchMedia(`(max-width: ${devices.tabletMax})`);
+    const onChange = (e) => setIsTabletDown(e.matches);
+
+    // Safari < 14 fallback
+    if (mq.addEventListener) mq.addEventListener('change', onChange);
+    else mq.addListener(onChange);
+
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener('change', onChange);
+      else mq.removeListener(onChange);
+    };
+  }, []);
+
+  const isGraphExpanded = useMemo(
+    () => isOpen && activeTab === 'graph' && (graphFullscreen || isTabletDown),
+    [activeTab, graphFullscreen, isOpen, isTabletDown],
+  );
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return undefined;
+    const shouldLock = isOpen && activeTab === 'graph';
+    document.body.classList.toggle('tools-graph-open', shouldLock);
+    return () => {
+      document.body.classList.remove('tools-graph-open');
+    };
+  }, [activeTab, isOpen]);
 
   return (
     <>
@@ -162,7 +205,7 @@ export default function ToolsDock() {
         <LineChart size={24} />
       </Fab>
       <Overlay $open={isOpen} onClick={() => setIsOpen(false)} />
-      <Dock $open={isOpen} $fullscreen={isGraphFullscreen}>
+      <Dock $open={isOpen} $fullscreen={isGraphExpanded}>
         <DockHeader>
           <Tabs>
             {TABS.map(({ id, label, icon: Icon }) => (
