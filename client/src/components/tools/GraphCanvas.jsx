@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useRef, useMemo, useId, forwardRef, useImperativeHandle } from 'react';
 import styled from 'styled-components';
 import { lineFromConstraint, parseObjective, worldToSvg } from '../../utils/graphHelpers';
 import { feasibleRegionPolygon } from '../../utils/feasibleRegion';
+import { solveGraphicalLP, formatCoord } from '../../utils/lpSolver';
 import { samplePlot } from '../../utils/plotSampler';
 import { buildAxisTicks, pixelsPerUnit } from '../../utils/axisTicks';
 import { useTools } from '../../context/ToolsContext';
@@ -13,10 +14,6 @@ const Canvas = styled.div`
   height: 100%;
   min-height: 200px;
   background: #fff;
-  background-image:
-    linear-gradient(to right, rgba(117, 119, 126, 0.1) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(117, 119, 126, 0.1) 1px, transparent 1px);
-  background-size: ${({ $gridX, $gridY }) => `${$gridX}px ${$gridY}px`};
   border-radius: ${({ theme }) => theme.radii.lg};
   overflow: hidden;
 `;
@@ -110,9 +107,40 @@ function renderYTicks(ticks, axisX, w, h, xRange, yRange, pad, hideZeroLabel) {
   });
 }
 
-export default function GraphCanvas({ expressions = [], lpConfig = null }) {
+function buildGridPattern(gridX, gridY, patternId) {
+  return (
+    <pattern id={patternId} width={gridX} height={gridY} patternUnits="userSpaceOnUse">
+      <path
+        d={`M ${gridX} 0 L 0 0 0 ${gridY}`}
+        fill="none"
+        stroke="rgba(117, 119, 126, 0.1)"
+        strokeWidth="1"
+      />
+    </pattern>
+  );
+}
+
+function buildObjectiveLine(obj, k, xRange) {
+  const pts = [];
+  const { coeffs } = obj;
+  if (Math.abs(coeffs.y) < 1e-9) return pts;
+  for (let x = xRange[0]; x <= xRange[1]; x += 0.5) {
+    const y = (k - coeffs.x * x) / coeffs.y;
+    if (isFinite(y)) pts.push({ x, y });
+  }
+  return pts;
+}
+
+const GraphCanvas = forwardRef(function GraphCanvas({ expressions = [], lpConfig = null }, ref) {
   const { graphScale } = useTools();
   const [containerRef, { width, height }] = useResizeObserver();
+  const svgRef = useRef(null);
+  const gridPatternId = useId().replace(/:/g, '');
+
+  useImperativeHandle(ref, () => ({
+    getSvgElement: () => svgRef.current,
+    getDimensions: () => ({ width: width || 600, height: height || 400 }),
+  }));
 
   const xRange = [graphScale.xMin, graphScale.xMax];
   const yRange = [graphScale.yMin, graphScale.yMax];
@@ -125,6 +153,11 @@ export default function GraphCanvas({ expressions = [], lpConfig = null }) {
   const pxPerY = pixelsPerUnit(graphScale.yMin, graphScale.yMax, h);
   const gridX = Math.max(8, pxPerX * majorStep);
   const gridY = Math.max(8, pxPerY * majorStep);
+
+  const lpSolution = useMemo(() => {
+    if (!lpConfig?.constraints?.length || !lpConfig.objective) return null;
+    return solveGraphicalLP(lpConfig.constraints, lpConfig.objective, xRange, yRange);
+  }, [lpConfig, graphScale]);
 
   const feasiblePolygon = useMemo(() => {
     if (!lpConfig?.constraints) return null;
@@ -163,12 +196,11 @@ export default function GraphCanvas({ expressions = [], lpConfig = null }) {
 
       if (lpConfig.objective) {
         const obj = parseObjective(lpConfig.objective);
-        const k = graphScale.yMax;
-        const pts = [];
-        for (let x = xRange[0]; x <= xRange[1]; x += 1) {
-          const y = (k - obj.coeffs.x * x) / (obj.coeffs.y || 1);
-          if (isFinite(y)) pts.push({ x, y });
-        }
+        const k =
+          lpSolution?.optimal?.z ??
+          obj.coeffs.x * ((xRange[0] + xRange[1]) / 2) +
+            obj.coeffs.y * ((yRange[0] + yRange[1]) / 2);
+        const pts = buildObjectiveLine(obj, k, xRange);
         if (pts.length > 1) {
           result.push({
             d: pointsToPath(pts, w, h, xRange, yRange),
@@ -200,7 +232,7 @@ export default function GraphCanvas({ expressions = [], lpConfig = null }) {
       });
 
     return result;
-  }, [expressions, lpConfig, w, h, graphScale]);
+  }, [expressions, lpConfig, w, h, graphScale, lpSolution]);
 
   const axisX = worldToSvg(0, 0, w, h, xRange, yRange).sy;
   const axisY = worldToSvg(0, 0, w, h, xRange, yRange).sx;
@@ -228,9 +260,16 @@ export default function GraphCanvas({ expressions = [], lpConfig = null }) {
     graphScale.yMin <= 0 &&
     graphScale.yMax >= 0;
 
+  const optimalSet = useMemo(() => {
+    if (!lpSolution?.optima?.length) return new Set();
+    return new Set(lpSolution.optima.map((p) => `${p.x.toFixed(4)},${p.y.toFixed(4)}`));
+  }, [lpSolution]);
+
   return (
-    <Canvas ref={containerRef} $gridX={gridX} $gridY={gridY}>
-      <Svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+    <Canvas ref={containerRef}>
+      <Svg ref={svgRef} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none">
+        <defs>{buildGridPattern(gridX, gridY, gridPatternId)}</defs>
+        <rect width={w} height={h} fill={`url(#${gridPatternId})`} />
         {feasiblePolygon && (
           <polygon points={feasiblePolygon} fill="rgba(0, 106, 102, 0.12)" stroke="none" />
         )}
@@ -290,7 +329,46 @@ export default function GraphCanvas({ expressions = [], lpConfig = null }) {
             />
           );
         })}
+        {lpSolution?.corners?.map((corner, i) => {
+          const key = `${corner.x.toFixed(4)},${corner.y.toFixed(4)}`;
+          const isOptimal = optimalSet.has(key);
+          const { sx, sy } = worldToSvg(corner.x, corner.y, w, h, xRange, yRange);
+          if (isOptimal) return null;
+          return (
+            <circle
+              key={`corner-${i}`}
+              cx={sx}
+              cy={sy}
+              r={4}
+              fill="rgba(0, 106, 102, 0.35)"
+              stroke={PLOT_COLORS.teal}
+              strokeWidth="1.5"
+            />
+          );
+        })}
+        {lpSolution?.optima?.map((opt, i) => {
+          const { sx, sy } = worldToSvg(opt.x, opt.y, w, h, xRange, yRange);
+          return (
+            <g key={`opt-${i}`}>
+              <circle cx={sx} cy={sy} r={7} fill={PLOT_COLORS.magenta} stroke="#fff" strokeWidth="2" />
+              <text
+                x={sx + 10}
+                y={sy - 8}
+                {...LABEL_STYLE}
+                fill={PLOT_COLORS.magenta}
+                fontWeight="600"
+              >
+                {`(${formatCoord(opt.x)}, ${formatCoord(opt.y)})`}
+              </text>
+              <text x={sx + 10} y={sy + 6} {...LABEL_STYLE} fill={PLOT_COLORS.magenta}>
+                {`Z* = ${formatCoord(opt.z)}`}
+              </text>
+            </g>
+          );
+        })}
       </Svg>
     </Canvas>
   );
-}
+});
+
+export default GraphCanvas;

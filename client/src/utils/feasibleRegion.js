@@ -138,9 +138,7 @@ function dedupePoints(points) {
   });
 }
 
-export function feasibleRegionPolygon(constraints, xRange = [-1, 10], yRange = [-2, 12]) {
-  if (!constraints?.length) return [];
-
+function collectFeasibleVertices(constraints, xRange, yRange) {
   const lines = constraints.map(boundaryLine).filter(Boolean);
   const candidates = [];
 
@@ -180,7 +178,19 @@ export function feasibleRegionPolygon(constraints, xRange = [-1, 10], yRange = [
     { x: xMax, y: yMax },
   );
 
-  const feasible = dedupePoints(candidates).filter((p) => isFeasible(p.x, p.y, constraints));
+  return dedupePoints(candidates).filter((p) => isFeasible(p.x, p.y, constraints));
+}
+
+/** All feasible corner candidates before hull (intersections + boundary clips). */
+export function getFeasibleVertices(constraints, xRange = [-1, 10], yRange = [-2, 12]) {
+  if (!constraints?.length) return [];
+  return collectFeasibleVertices(constraints, xRange, yRange);
+}
+
+export function feasibleRegionPolygon(constraints, xRange = [-1, 10], yRange = [-2, 12]) {
+  if (!constraints?.length) return [];
+
+  const feasible = collectFeasibleVertices(constraints, xRange, yRange);
   if (feasible.length < 3) return [];
 
   return convexHull(feasible);

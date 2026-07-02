@@ -1,7 +1,10 @@
+import { useRef, useMemo } from 'react';
 import styled from 'styled-components';
-import { Plus, Eye, EyeOff, X, Maximize2, Minimize2 } from 'lucide-react';
+import { Plus, Eye, EyeOff, X, Maximize2, Minimize2, Download, Layers } from 'lucide-react';
 import { useTools } from '../../context/ToolsContext';
-import { getPlotColor, plotLabel, resolvePlotType } from '../../utils/plotSampler';
+import { getPlotColor, plotLabel, resolvePlotType, isLpConstraint } from '../../utils/plotSampler';
+import { solveGraphicalLP, formatLpResult } from '../../utils/lpSolver';
+import { exportGraphSvg, exportGraphPng } from '../../utils/exportGraph';
 import GraphCanvas from './GraphCanvas';
 import media from '../../styles/media';
 
@@ -146,6 +149,11 @@ const IconBtn = styled.button`
   &:hover {
     background: ${({ theme }) => theme.colors.surfaceContainer};
   }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 `;
 
 const AddBtn = styled.button`
@@ -158,6 +166,15 @@ const AddBtn = styled.button`
   letter-spacing: 0.05em;
   padding: ${({ theme }) => theme.spacing.sm};
   min-height: 44px;
+`;
+
+const LpModeBtn = styled(AddBtn)`
+  ${({ $active, theme }) =>
+    $active &&
+    `
+    background: ${theme.colors.primaryContainer};
+    border-radius: ${theme.radii.md};
+  `}
 `;
 
 const ListCompact = styled(List)`
@@ -219,6 +236,7 @@ const ResetScaleBtn = styled.button`
   min-height: 36px;
   white-space: nowrap;
 `;
+
 const LpTitle = styled.div`
   font-weight: 600;
   margin-bottom: 4px;
@@ -231,6 +249,36 @@ const LpLine = styled.div`
   word-break: break-all;
 `;
 
+const LpStatus = styled.div`
+  font-size: 13px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.primary};
+  margin-top: ${({ theme }) => theme.spacing.sm};
+  padding: ${({ theme }) => theme.spacing.sm};
+  background: ${({ theme }) => theme.colors.primaryContainer};
+  border-radius: ${({ theme }) => theme.radii.md};
+`;
+
+const ConstraintRow = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 6px;
+`;
+
+const ConstraintInput = styled(ExprInput)`
+  margin-bottom: 0;
+  padding: 4px 0;
+`;
+
+const ObjectiveLabel = styled.div`
+  font-size: 12px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.onSurfaceVariant};
+  margin-top: 8px;
+  margin-bottom: 4px;
+`;
+
 const COLORS = {
   teal: '#006a66',
   magenta: '#d81b60',
@@ -240,20 +288,43 @@ const COLORS = {
 
 function placeholderForMode(mode, expr) {
   const resolved = mode === 'auto' ? resolvePlotType(expr) : mode;
+  if (resolved === 'constraint') return '2*x + 3*y <= 12';
   return resolved === 'implicit' ? 'x^2 + y^2 = 9' : 'x^2 + 2*x';
 }
 
 export default function GraphingPanel() {
+  const canvasRef = useRef(null);
   const {
     expressions,
     setExpressions,
     lpConfig,
+    enterLpMode,
+    clearLpMode,
+    addLpConstraint,
+    appendLpConstraint,
+    updateLpConstraint,
+    removeLpConstraint,
+    setLpObjective,
     graphFullscreen,
     setGraphFullscreen,
     graphScale,
     setGraphScale,
     resetGraphScale,
   } = useTools();
+
+  const isUserLp = lpConfig?.source === 'user';
+  const hasGraphContent = Boolean(lpConfig) || expressions.some((e) => e.expr?.trim());
+
+  const lpStatus = useMemo(() => {
+    if (!lpConfig?.constraints?.length || !lpConfig.objective) return '';
+    const solution = solveGraphicalLP(
+      lpConfig.constraints,
+      lpConfig.objective,
+      [graphScale.xMin, graphScale.xMax],
+      [graphScale.yMin, graphScale.yMax],
+    );
+    return formatLpResult(solution);
+  }, [lpConfig, graphScale]);
 
   const updateScale = (key, raw) => {
     const num = parseFloat(raw);
@@ -268,6 +339,13 @@ export default function GraphingPanel() {
     if (yMin >= yMax) patch.yMax = yMin + 1;
     if (!step || step < 0.1) patch.step = 1;
     if (Object.keys(patch).length) setGraphScale(patch);
+  };
+
+  const handleExprBlur = (id, expr) => {
+    const trimmed = expr?.trim();
+    if (!isLpConstraint(trimmed)) return;
+    setExpressions((prev) => prev.filter((e) => e.id !== id));
+    appendLpConstraint(trimmed);
   };
 
   const updateExpr = (id, patch) => {
@@ -307,6 +385,25 @@ export default function GraphingPanel() {
     ]);
   };
 
+  const toggleLpMode = () => {
+    if (lpConfig && isUserLp) {
+      clearLpMode();
+    } else {
+      enterLpMode();
+    }
+  };
+
+  const handleExportSvg = () => {
+    const svg = canvasRef.current?.getSvgElement();
+    exportGraphSvg(svg, 'lp-graph.svg');
+  };
+
+  const handleExportPng = () => {
+    const svg = canvasRef.current?.getSvgElement();
+    const { width, height } = canvasRef.current?.getDimensions() ?? {};
+    exportGraphPng(svg, width, height, 'lp-graph.png');
+  };
+
   return (
     <Panel>
       <Header>
@@ -314,14 +411,42 @@ export default function GraphingPanel() {
         <HeaderActions>
           <IconBtn
             type="button"
+            onClick={handleExportSvg}
+            disabled={!hasGraphContent}
+            aria-label="Export SVG"
+            title="Export SVG"
+          >
+            <Download size={18} />
+          </IconBtn>
+          <IconBtn
+            type="button"
+            onClick={handleExportPng}
+            disabled={!hasGraphContent}
+            aria-label="Export PNG"
+            title="Export PNG"
+          >
+            <span style={{ fontSize: 11, fontWeight: 700 }}>PNG</span>
+          </IconBtn>
+          <IconBtn
+            type="button"
             onClick={() => setGraphFullscreen((v) => !v)}
             aria-label={graphFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
           >
             {graphFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
           </IconBtn>
-          <AddBtn type="button" onClick={addExpr}>
-            <Plus size={18} /> Add
-          </AddBtn>
+          <LpModeBtn type="button" onClick={toggleLpMode} $active={isUserLp} title="LP mode">
+            <Layers size={18} /> LP
+          </LpModeBtn>
+          {!lpConfig && (
+            <AddBtn type="button" onClick={addExpr}>
+              <Plus size={18} /> Add
+            </AddBtn>
+          )}
+          {isUserLp && (
+            <AddBtn type="button" onClick={addLpConstraint}>
+              <Plus size={18} /> Constraint
+            </AddBtn>
+          )}
         </HeaderActions>
       </Header>
       <ScaleSection>
@@ -388,7 +513,41 @@ export default function GraphingPanel() {
       </ScaleSection>
       {(lpConfig || expressions.length > 0) && (
         <ListCompact $compact={graphFullscreen}>
-          {lpConfig && (
+          {lpConfig && isUserLp && (
+            <Card>
+              <Strip $color={COLORS.teal} />
+              <CardBody>
+                <CardHeader>
+                  <LpTitle>LP Mode</LpTitle>
+                  <CardActions>
+                    <button type="button" onClick={clearLpMode} aria-label="Exit LP mode">
+                      <X size={16} />
+                    </button>
+                  </CardActions>
+                </CardHeader>
+                {lpConfig.constraints.map((c, i) => (
+                  <ConstraintRow key={i}>
+                    <ConstraintInput
+                      value={c}
+                      placeholder="2*x + 3*y <= 12"
+                      onChange={(e) => updateLpConstraint(i, e.target.value)}
+                    />
+                    <button type="button" onClick={() => removeLpConstraint(i)} aria-label="Remove constraint">
+                      <X size={16} />
+                    </button>
+                  </ConstraintRow>
+                ))}
+                <ObjectiveLabel>Objective</ObjectiveLabel>
+                <ConstraintInput
+                  value={lpConfig.objective || ''}
+                  placeholder="Maximize 3*x + 2*y"
+                  onChange={(e) => setLpObjective(e.target.value)}
+                />
+                {lpStatus && <LpStatus>{lpStatus}</LpStatus>}
+              </CardBody>
+            </Card>
+          )}
+          {lpConfig && !isUserLp && (
             <Card>
               <Strip $color={COLORS.teal} />
               <CardBody>
@@ -399,47 +558,78 @@ export default function GraphingPanel() {
                 {lpConfig.objective && (
                   <LpLine style={{ marginTop: 8, color: COLORS.magenta }}>{lpConfig.objective}</LpLine>
                 )}
+                {lpStatus && <LpStatus>{lpStatus}</LpStatus>}
               </CardBody>
             </Card>
           )}
-          {expressions.map((e, i) => (
-            <Card key={e.id}>
-              <Strip $color={COLORS[e.color] || COLORS.teal} />
-              <CardBody>
-                <CardHeader>
-                  <CardLabel style={{ color: COLORS[e.color] || COLORS.teal }}>
-                    {e.label || plotLabel(e.expr, i, e.mode)}
-                  </CardLabel>
-                  <CardActions>
-                    <button type="button" onClick={() => toggleVisible(e.id)} aria-label="Toggle visibility">
-                      {e.visible ? <Eye size={16} /> : <EyeOff size={16} />}
-                    </button>
-                    <button type="button" onClick={() => removeExpr(e.id)} aria-label="Remove">
-                      <X size={16} />
-                    </button>
-                  </CardActions>
-                </CardHeader>
-                <ExprInput
-                  value={e.expr}
-                  placeholder={placeholderForMode(e.mode || 'auto', e.expr)}
-                  onChange={(ev) => updateExpr(e.id, { expr: ev.target.value })}
-                />
-                <ModeSelect
-                  value={e.mode || 'auto'}
-                  onChange={(ev) => updateExpr(e.id, { mode: ev.target.value })}
-                  aria-label="Plot mode"
-                >
-                  <option value="auto">Auto</option>
-                  <option value="explicit">y = f(x)</option>
-                  <option value="implicit">F(x,y) = 0</option>
-                </ModeSelect>
-              </CardBody>
-            </Card>
-          ))}
+          {!lpConfig &&
+            expressions.map((e, i) => (
+              <Card key={e.id}>
+                <Strip $color={COLORS[e.color] || COLORS.teal} />
+                <CardBody>
+                  <CardHeader>
+                    <CardLabel style={{ color: COLORS[e.color] || COLORS.teal }}>
+                      {e.label || plotLabel(e.expr, i, e.mode)}
+                    </CardLabel>
+                    <CardActions>
+                      <button type="button" onClick={() => toggleVisible(e.id)} aria-label="Toggle visibility">
+                        {e.visible ? <Eye size={16} /> : <EyeOff size={16} />}
+                      </button>
+                      <button type="button" onClick={() => removeExpr(e.id)} aria-label="Remove">
+                        <X size={16} />
+                      </button>
+                    </CardActions>
+                  </CardHeader>
+                  <ExprInput
+                    value={e.expr}
+                    placeholder={placeholderForMode(e.mode || 'auto', e.expr)}
+                    onChange={(ev) => updateExpr(e.id, { expr: ev.target.value })}
+                    onBlur={(ev) => handleExprBlur(e.id, ev.target.value)}
+                  />
+                  <ModeSelect
+                    value={e.mode || 'auto'}
+                    onChange={(ev) => updateExpr(e.id, { mode: ev.target.value })}
+                    aria-label="Plot mode"
+                  >
+                    <option value="auto">Auto</option>
+                    <option value="explicit">y = f(x)</option>
+                    <option value="implicit">F(x,y) = 0</option>
+                  </ModeSelect>
+                </CardBody>
+              </Card>
+            ))}
+          {lpConfig &&
+            isUserLp &&
+            expressions.map((e, i) => (
+              <Card key={e.id}>
+                <Strip $color={COLORS[e.color] || COLORS.teal} />
+                <CardBody>
+                  <CardHeader>
+                    <CardLabel style={{ color: COLORS[e.color] || COLORS.teal }}>
+                      {e.label || plotLabel(e.expr, i, e.mode)}
+                    </CardLabel>
+                    <CardActions>
+                      <button type="button" onClick={() => toggleVisible(e.id)} aria-label="Toggle visibility">
+                        {e.visible ? <Eye size={16} /> : <EyeOff size={16} />}
+                      </button>
+                      <button type="button" onClick={() => removeExpr(e.id)} aria-label="Remove">
+                        <X size={16} />
+                      </button>
+                    </CardActions>
+                  </CardHeader>
+                  <ExprInput
+                    value={e.expr}
+                    placeholder={placeholderForMode(e.mode || 'auto', e.expr)}
+                    onChange={(ev) => updateExpr(e.id, { expr: ev.target.value })}
+                    onBlur={(ev) => handleExprBlur(e.id, ev.target.value)}
+                  />
+                </CardBody>
+              </Card>
+            ))}
         </ListCompact>
       )}
       <GraphArea>
-        <GraphCanvas expressions={expressions} lpConfig={lpConfig} />
+        <GraphCanvas ref={canvasRef} expressions={expressions} lpConfig={lpConfig} />
       </GraphArea>
     </Panel>
   );

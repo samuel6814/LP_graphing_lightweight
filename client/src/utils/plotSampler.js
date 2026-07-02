@@ -15,9 +15,15 @@ export function normalizePlotVars(expr) {
     .replace(/\^/g, '^');
 }
 
+export function isLpConstraint(expr) {
+  const s = normalizePlotVars(expr).replace(/\s/g, '');
+  if (!/<=|>=/.test(s)) return false;
+  return !/(?<![=<>!])=(?!=)/.test(s);
+}
+
 export function detectPlotType(expr) {
   const s = normalizePlotVars(expr).replace(/\s/g, '');
-  if (/<=|>=|!=/.test(s)) return 'explicit';
+  if (isLpConstraint(expr)) return 'constraint';
   if (/(?<![=<>!])=(?!=)/.test(s)) return 'implicit';
   return 'explicit';
 }
@@ -212,6 +218,7 @@ export function sampleImplicit(expr, xRange, yRange, gridSteps = 80, mode = 'aut
 export function samplePlot(expr, xRange, yRange, mode = 'auto') {
   if (!isPlottable(expr)) return { segments: [] };
   const type = resolvePlotType(expr, mode);
+  if (type === 'constraint') return { segments: [] };
   if (type === 'implicit') {
     return sampleImplicit(expr, xRange, yRange, 80, mode);
   }
