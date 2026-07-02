@@ -1,33 +1,192 @@
 # LP Grapher
 
-Interactive learning app for **MATH 466 — Optimization II** (Linear Programming). Built with React, styled-components, KaTeX, and GSAP.
+**Open-source interactive linear programming course with KaTeX explainers, LP graphing, and step-by-step solvers — built for MATH 466 Optimization II.**
 
-**Live:** [https://lp-graph-six.vercel.app](https://lp-graph-six.vercel.app)
+**Live demo:** [https://lp-graph-six.vercel.app](https://lp-graph-six.vercel.app)
+
+LP Grapher is a browser-based learning app for **MATH 466 — Optimization II** (Linear Programming) at KNUST. It turns the course curriculum into structured topic pages with rendered math, practice questions, and built-in tools so students, self-learners, and educators can study LP graphically and algebraically without installing anything.
+
+The curriculum is derived from the MATH 466 course materials (`MATH 466.pdf` in this repo). Content is organized into five modules covering foundations, graphical methods, the simplex method, duality, and applications.
+
+---
 
 ## Features
 
-- Landing page with course overview
-- 21 topic explainers with practice questions (from MATH 466 slides)
-- Global graphing calculator, scientific calculator, and step-by-step solver dock
-- LP-specific graph presets per topic (constraints, feasible regions, objective lines)
+### Learn Hub
 
-## Quick start
+- **21 topics** across **5 modules** — Introduction, Graphical Methods, Simplex, Duality & Sensitivity, and LP Applications
+- **Search** across topic titles, summaries, and quick answers
+- **Progress tracking** — mark topics complete; progress persists in `localStorage` (`lp-grapher-progress`)
+- Module-grouped topic cards with completion indicators
+
+### Topic pages
+
+- **KaTeX-rendered math** for explainers, equations, and practice
+- **Quick answer** summaries at the top of each topic for fast review
+- **Practice questions** with expandable solutions
+- **FAQ sections** with structured data for search engines
+- **Prev/next navigation** between topics in the same module
+- **Topic-specific graph presets** — open the tools dock with constraints or functions pre-loaded
+
+### Graphing tool
+
+- Plot **explicit** (`y = f(x)`), **implicit** (`F(x,y) = 0`), and **auto-detected** expressions
+- **LP mode** — enter constraints and an objective; visualize feasible regions, isoprofit lines, and optimal corners
+- Adjustable axis scale (x/y min/max, step) with reset
+- **Export** graph as SVG or PNG
+- **State persistence** — expressions, scale, and LP config saved to `localStorage`
+- **Mobile-friendly** — fullscreen graph dock on tablet/phone with scrollable controls
+
+### Calculator and step-by-step solver
+
+- **Scientific calculator** with expression evaluation (mathjs)
+- **Step-by-step solver** panel for worked solution paths on practice problems
+- Global **tools dock** available on every learn page (Graph · Calc · Solver tabs)
+
+### UX and accessibility
+
+- **Light / dark / system** theme toggle with persistence
+- Responsive layout from mobile through desktop
+- Body scroll lock while the graph tab is open so interaction stays inside the tool
+
+### SEO and discoverability
+
+- Auto-generated `sitemap.xml`, `robots.txt`, and `llms.txt` at build time
+- JSON-LD structured data (breadcrumbs, FAQ, course info)
+- Configurable canonical URL via `VITE_SITE_URL`
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for deploy and SEO follow-up steps.
+
+---
+
+## Screenshots
+
+_Screenshots coming soon — contributions welcome._
+
+- Learn Hub with module cards and progress bar
+- Topic page with KaTeX math and practice questions
+- LP graphing tool with feasible region and optimal corner
+
+---
+
+## Tech stack
+
+| Layer | Technology |
+|-------|------------|
+| UI | React 19, styled-components |
+| Build | Vite 8 |
+| Routing | React Router 7 |
+| Math | KaTeX, react-katex, mathjs |
+| Animation | GSAP |
+| Icons | lucide-react |
+| Hosting | Vercel (static SPA) |
+
+---
+
+## Getting started
+
+### Prerequisites
+
+- Node.js 18+ (20+ recommended)
+- npm
+
+### Install and run
 
 ```bash
 cd client
 npm install
-npm run dev
+npm run dev        # http://localhost:5173
 ```
 
-## Structure
+### Other scripts
+
+```bash
+npm run build          # production build (runs prebuild SEO asset generation)
+npm run preview        # serve the production build locally
+npm run lint           # oxlint
+npm run validate-math  # check topic math content
+```
+
+---
+
+## Project structure
 
 ```
-client/          # Vite React app (deploy this to Vercel)
-docs/            # Phase docs + curriculum outline
-MATH 466.pdf     # Source curriculum
-stitch_math_solver_and_grapher/  # Design references
+graphv1/
+├── client/                          # Vite React app — deploy this directory to Vercel
+│   ├── src/
+│   │   ├── pages/                   # Landing, Learn Hub, topic pages
+│   │   ├── components/
+│   │   │   ├── tools/               # ToolsDock, GraphingPanel, Calculator, Solver
+│   │   │   └── presentation/        # MathText, MathSection, PracticeQuestion
+│   │   ├── data/
+│   │   │   ├── topicRegistry.js     # Topic metadata and module map
+│   │   │   └── topics/              # Per-topic explainer + practice content
+│   │   ├── utils/                   # lpSolver, plotSampler, progress, graphStorage, SEO
+│   │   ├── context/                 # Tools, theme, topic progress providers
+│   │   └── styles/                  # Theme tokens, global styles, breakpoints
+│   ├── scripts/                     # SEO asset generator, math validator
+│   ├── public/                      # Static assets, generated sitemap/robots/llms.txt
+│   └── vercel.json                  # SPA rewrites + security headers
+├── docs/
+│   ├── curriculum-outline.md        # Full topic slug list by module
+│   └── phases/                      # Development phase notes
+├── DEPLOYMENT.md                    # Vercel deploy guide
+├── MATH 466.pdf                     # Source curriculum
+└── readme.md
 ```
+
+---
+
+## Configuration
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `VITE_SITE_URL` | Optional | Production URL for canonical links, Open Graph, and sitemap. Defaults to `https://lp-graph-six.vercel.app`. Copy [`client/env.production.example`](client/env.production.example) to `client/.env.production` for local production builds. |
+
+No backend or database is required — the app is fully static.
+
+---
 
 ## Deploy
 
-See [DEPLOYMENT.md](DEPLOYMENT.md).
+Deploy the `client/` directory to Vercel (or any static host). Full instructions: [DEPLOYMENT.md](DEPLOYMENT.md).
+
+---
+
+## Contributing
+
+Contributions are welcome. This is an educational open-source project — fixes, content improvements, and accessibility enhancements are especially appreciated.
+
+1. **Fork** the repository and create a branch from `main`.
+2. **Make your changes** — keep diffs focused.
+3. **Verify** before opening a PR:
+   ```bash
+   cd client
+   npm run lint
+   npm run validate-math
+   npm run build
+   ```
+4. **Open a pull request** with a clear description of what changed and why.
+
+### Adding or editing topics
+
+1. Add metadata in [`client/src/data/topicRegistry.js`](client/src/data/topicRegistry.js) (slug, title, module, summary, optional `defaultGraph`).
+2. Add content in [`client/src/data/topics/`](client/src/data/topics/) — see existing topics for the section/paragraph/math block format.
+3. Update [`docs/curriculum-outline.md`](docs/curriculum-outline.md) if the curriculum list changes.
+4. Run `npm run validate-math` to catch math rendering issues.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+Copyright (c) 2026 samuel6814
+
+---
+
+## Acknowledgments
+
+- **MATH 466 — Optimization II**, Department of Mathematics, KNUST — curriculum source
+- Built as a free, open-source tool for anyone learning linear programming
