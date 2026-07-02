@@ -527,7 +527,7 @@ export default function GraphingPanel() {
                   <ConstraintRow key={i}>
                     <ConstraintInput
                       value={c}
-                      placeholder="2*x + 3*y <= 12"
+                      placeholder="2x+3y<=12"
                       onChange={(e) => updateLpConstraint(i, e.target.value)}
                     />
                     <button type="button" onClick={() => removeLpConstraint(i)} aria-label="Remove constraint">
@@ -538,7 +538,7 @@ export default function GraphingPanel() {
                 <ObjectiveLabel>Objective</ObjectiveLabel>
                 <ConstraintInput
                   value={lpConfig.objective || ''}
-                  placeholder="Maximize 3*x + 2*y"
+                  placeholder="Maximize 3x+2y"
                   onChange={(e) => setLpObjective(e.target.value)}
                 />
                 {lpStatus && <LpStatus>{lpStatus}</LpStatus>}

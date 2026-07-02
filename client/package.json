@@ -8,6 +8,7 @@
     "prebuild": "node scripts/generate-seo-assets.js",
     "build": "vite build",
     "validate-math": "node scripts/validate-math.js",
+    "test:feasible": "node scripts/test-feasible-region.js",
     "lint": "oxlint",
     "preview": "vite preview"
   },
