@@ -1,0 +1,14 @@
+# LP Grapher — allow search and AI answer crawlers
+User-agent: *
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://example.com/sitemap.xml

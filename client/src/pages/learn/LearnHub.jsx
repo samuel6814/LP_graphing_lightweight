@@ -1,14 +1,15 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Search, CheckCircle, ArrowRight } from 'lucide-react';
 import { topics, modules, getModuleTitle } from '../../data/topicRegistry';
 import { getTopicPath } from '../../utils/routes';
 import { useTopicProgress } from '../../context/TopicProgressContext';
+import { usePageMeta } from '../../hooks/usePageMeta';
+import { JsonLdMulti } from '../../components/seo/JsonLd';
+import { learnHubSchemas } from '../../utils/seoSchema';
 import { CardGrid } from '../../styles/layout';
 import media from '../../styles/media';
-
-const DEFAULT_TITLE = 'LP Grapher — MATH 466 Optimization II';
 
 const Header = styled.div`
   margin-bottom: ${({ theme }) => theme.spacing.xl};
@@ -149,13 +150,15 @@ const CardFooter = styled.div`
 export default function LearnHub() {
   const [query, setQuery] = useState('');
   const { isComplete } = useTopicProgress();
+  const schemas = useMemo(() => learnHubSchemas(), []);
 
-  useEffect(() => {
-    document.title = 'Learn Hub — LP Grapher';
-    return () => {
-      document.title = DEFAULT_TITLE;
-    };
-  }, []);
+  usePageMeta({
+    title: 'Learn Hub',
+    description:
+      'Browse 21 MATH 466 linear programming topics with KaTeX explainers, practice questions, and interactive LP graphing tools.',
+    path: '/learn',
+    keywords: ['learn hub', 'linear programming topics', 'MATH 466', 'optimization course'],
+  });
 
   const completedCount = useMemo(
     () => topics.filter((t) => isComplete(t.slug)).length,
@@ -168,12 +171,16 @@ export default function LearnHub() {
     const q = query.toLowerCase().trim();
     if (!q) return topics;
     return topics.filter(
-      (t) => t.title.toLowerCase().includes(q) || t.summary.toLowerCase().includes(q),
+      (t) =>
+        t.title.toLowerCase().includes(q) ||
+        t.summary.toLowerCase().includes(q) ||
+        t.quickAnswer?.toLowerCase().includes(q),
     );
   }, [query]);
 
   return (
     <>
+      <JsonLdMulti graphs={schemas} />
       <Header>
         <Title>Learn Hub</Title>
         <Sub>Select a MATH 466 topic to study explainers, practice questions, and interactive graphs.</Sub>

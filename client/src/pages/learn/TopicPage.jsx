@@ -1,17 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { ArrowLeft, ArrowRight, CheckCircle, ChevronDown, ChevronUp, LineChart } from 'lucide-react';
-import { getTopicBySlug, getAdjacentTopics } from '../../data/topicRegistry';
+import { getTopicBySlug, getAdjacentTopics, getModuleTitle } from '../../data/topicRegistry';
 import { loadTopicContent } from '../../data/topics';
 import { useTools } from '../../context/ToolsContext';
 import { useTopicProgress } from '../../context/TopicProgressContext';
+import { usePageMeta } from '../../hooks/usePageMeta';
+import { JsonLdMulti } from '../../components/seo/JsonLd';
+import { topicPageSchemas } from '../../utils/seoSchema';
+import { getTopicFaq } from '../../utils/topicFaq';
 import MathSection from '../../components/presentation/MathSection';
+import MathText from '../../components/presentation/MathText';
 import PracticeQuestion from '../../components/presentation/PracticeQuestion';
 import { ROUTES, getTopicPath } from '../../utils/routes';
 import media from '../../styles/media';
-
-const DEFAULT_TITLE = 'LP Grapher — MATH 466 Optimization II';
 
 const Back = styled(Link)`
   display: inline-flex;
@@ -73,9 +76,69 @@ const CompletedBadge = styled.span`
 
 const Summary = styled.p`
   color: ${({ theme }) => theme.colors.onSurfaceVariant};
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
   font-size: ${({ theme }) => theme.typography.bodyLg.fontSize};
   line-height: 1.6;
+`;
+
+const QuickAnswer = styled.section`
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
+  padding: ${({ theme }) => theme.spacing.md};
+  background: ${({ theme }) => theme.colors.primaryContainer};
+  border-radius: ${({ theme }) => theme.radii.lg};
+  border-left: 4px solid ${({ theme }) => theme.colors.primary};
+`;
+
+const QuickAnswerHeading = styled.h2`
+  font-family: ${({ theme }) => theme.fonts.display};
+  font-size: ${({ theme }) => theme.typography.headlineSm.fontSize};
+  color: ${({ theme }) => theme.colors.primary};
+  margin-bottom: ${({ theme }) => theme.spacing.sm};
+`;
+
+const QuickAnswerText = styled.p`
+  font-size: ${({ theme }) => theme.typography.bodyMd.fontSize};
+  line-height: 1.65;
+  color: ${({ theme }) => theme.colors.onSurface};
+`;
+
+const FaqSection = styled.section`
+  margin-top: ${({ theme }) => theme.spacing.xl};
+  padding-top: ${({ theme }) => theme.spacing.lg};
+  border-top: 1px solid ${({ theme }) => theme.colors.outlineVariant};
+`;
+
+const FaqHeading = styled.h2`
+  font-family: ${({ theme }) => theme.fonts.display};
+  font-size: ${({ theme }) => theme.typography.headlineSm.fontSize};
+  color: ${({ theme }) => theme.colors.primary};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+`;
+
+const FaqItem = styled.details`
+  margin-bottom: ${({ theme }) => theme.spacing.sm};
+  padding: ${({ theme }) => theme.spacing.md};
+  background: ${({ theme }) => theme.colors.surfaceContainerLow};
+  border: 1px solid ${({ theme }) => theme.colors.outlineVariant};
+  border-radius: ${({ theme }) => theme.radii.lg};
+`;
+
+const FaqQuestion = styled.summary`
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.primary};
+  cursor: pointer;
+  list-style: none;
+
+  &::-webkit-details-marker {
+    display: none;
+  }
+`;
+
+const FaqAnswer = styled.div`
+  margin-top: ${({ theme }) => theme.spacing.sm};
+  font-size: ${({ theme }) => theme.typography.bodyMd.fontSize};
+  line-height: 1.6;
+  color: ${({ theme }) => theme.colors.onSurfaceVariant};
 `;
 
 const ActionRow = styled.div`
@@ -249,14 +312,23 @@ export default function TopicPage() {
     }
   }, [topic, loadTopicGraph]);
 
-  useEffect(() => {
-    if (topic) {
-      document.title = `${topic.title} — LP Grapher`;
-    }
-    return () => {
-      document.title = DEFAULT_TITLE;
-    };
-  }, [topic]);
+  const faqItems = useMemo(() => (content ? getTopicFaq(content) : []), [content]);
+
+  const schemas = useMemo(() => {
+    if (!topic) return [];
+    return topicPageSchemas({
+      topic,
+      faqItems,
+    });
+  }, [topic, faqItems]);
+
+  usePageMeta({
+    title: topic?.title,
+    description: topic ? `${topic.quickAnswer || topic.summary} — ${getModuleTitle(topic.module)}.` : undefined,
+    path: topic ? `/learn/${topic.slug}` : '/learn',
+    type: 'article',
+    keywords: topic?.keywords,
+  });
 
   if (!topic) return <Navigate to={ROUTES.learn} replace />;
 
@@ -276,6 +348,7 @@ export default function TopicPage() {
 
   return (
     <>
+      <JsonLdMulti graphs={schemas} />
       <Back to={ROUTES.learn}>
         <ArrowLeft size={16} /> Back to topics
       </Back>
@@ -290,6 +363,12 @@ export default function TopicPage() {
             )}
           </TitleRow>
           <Summary>{topic.summary}</Summary>
+          {topic.quickAnswer && (
+            <QuickAnswer aria-labelledby="quick-answer-heading">
+              <QuickAnswerHeading id="quick-answer-heading">Quick answer</QuickAnswerHeading>
+              <QuickAnswerText>{topic.quickAnswer}</QuickAnswerText>
+            </QuickAnswer>
+          )}
           <ActionRow>
             {topic.defaultGraph && (
               <GraphBtn type="button" onClick={handleOpenGraph}>
@@ -304,6 +383,21 @@ export default function TopicPage() {
           </ActionRow>
           <TableOfContents sections={sections} />
           {content?.explainer && <MathSection sections={sections} idPrefix="section" />}
+          {faqItems.length > 0 && (
+            <FaqSection aria-labelledby="faq-heading">
+              <FaqHeading id="faq-heading">Frequently asked questions</FaqHeading>
+              {faqItems.map((item, i) => (
+                <FaqItem key={i}>
+                  <FaqQuestion>
+                    <MathText as="span">{item.raw.prompt}</MathText>
+                  </FaqQuestion>
+                  <FaqAnswer>
+                    <MathText as="span">{item.raw.answer}</MathText>
+                  </FaqAnswer>
+                </FaqItem>
+              ))}
+            </FaqSection>
+          )}
           <TopicNav>
             {prev ? (
               <NavLink to={getTopicPath(prev.slug)}>

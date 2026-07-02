@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { ROUTES } from '../utils/routes';
 import { PageSection } from '../styles/layout';
+import { usePageMeta } from '../hooks/usePageMeta';
 
 const Wrap = styled(PageSection)`
   min-height: 60vh;
@@ -35,6 +36,13 @@ const LinkBtn = styled(Link)`
 `;
 
 export default function NotFound() {
+  usePageMeta({
+    title: 'Page Not Found',
+    description: 'The page you requested could not be found on LP Grapher.',
+    path: '/404',
+    noindex: true,
+  });
+
   return (
     <Wrap $compact>
       <Code>404</Code>
